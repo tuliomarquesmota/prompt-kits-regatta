@@ -1,0 +1,26 @@
+{
+  "name": "lote",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "node --experimental-strip-types --test lib/labels.test.ts"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.47.10",
+    "@zxing/browser": "0.1.5",
+    "@zxing/library": "0.21.3",
+    "idb": "8.0.1",
+    "next": "15.1.12",
+    "react": "19.0.9",
+    "react-dom": "19.0.9"
+  },
+  "devDependencies": {
+    "@types/node": "22.10.2",
+    "@types/react": "19.0.2",
+    "@types/react-dom": "19.0.2",
+    "typescript": "5.7.2"
+  }
+}

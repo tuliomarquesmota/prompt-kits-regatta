@@ -1,0 +1,16 @@
+{
+  "name": "LOTE · Recebimento",
+  "short_name": "LOTE",
+  "description": "Recebimento de caixas por scan, com ou sem internet.",
+  "start_url": "/receber",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F3F2EF",
+  "theme_color": "#8E2A35",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
