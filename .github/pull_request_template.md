@@ -2,7 +2,7 @@
 
 <!-- Uma ou duas frases. Ex.: Adiciona a tela de stock por produto, com as caixas ordenadas por validade. -->
 
-Fecha #
+Closes #
 
 ## Como testei
 

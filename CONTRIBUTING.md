@@ -17,7 +17,7 @@ Dois sócios programando juntos, cada um com sua conta do GitHub e sua IA. Sem f
 4. **Trabalhe** com a sua IA. Ela deve seguir o [`AGENTS.md`](AGENTS.md)
 5. **Verifique**: `npm run check` e `npm run build`. Se a formatação falhar, `npm run format`
 6. **Envie**: `git add -A && git commit -m "Adiciona tela de stock" && git push -u origin feat/tela-stock`
-7. **Abra o PR** no GitHub (aparece um botão "Compare & pull request"). Preencha o modelo e escreva `Fecha #12` com o número da issue
+7. **Abra o PR** no GitHub (aparece um botão "Compare & pull request"). Preencha o modelo e escreva `Closes #12` com o número da issue (em inglês, para o GitHub fechar a issue sozinho)
 8. **Espere a verificação** ficar verde ✅. Se ficar vermelha ❌, abra os detalhes, corrija e envie de novo no mesmo branch
 9. **O outro sócio revisa** e aprova (ou pede ajustes)
 10. **Junte** com "Squash and merge" e apague o branch
