@@ -27,9 +27,14 @@ export default function OrdersList({ org, go }: Props) {
           <h1>Vendas</h1>
           <div className="muted">{org.name}</div>
         </div>
-        <button className="btn small" onClick={() => go("clientes")}>
-          Clientes
-        </button>
+        <div className="row">
+          <button className="btn small" onClick={() => go("receber")}>
+            A receber
+          </button>
+          <button className="btn small" onClick={() => go("clientes")}>
+            Clientes
+          </button>
+        </div>
       </div>
 
       <button className="btn primary" onClick={() => go("novo")}>

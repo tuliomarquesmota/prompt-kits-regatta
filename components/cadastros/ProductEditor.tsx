@@ -17,7 +17,16 @@ type Props = {
   go: (q: string) => void;
 };
 
-const empty: ProductForm = { name: "", supplier_id: "", gtin: "", sku: "", price: "", minKg: "", maxKg: "" };
+const empty: ProductForm = {
+  name: "",
+  supplier_id: "",
+  gtin: "",
+  sku: "",
+  price: "",
+  minKg: "",
+  maxKg: "",
+  vat: "0",
+};
 
 export default function ProductEditor({ org, productId, presetCode, presetSupplier, go }: Props) {
   const isNew = productId === "novo";
@@ -53,6 +62,7 @@ export default function ProductEditor({ org, productId, presetCode, presetSuppli
           price: numberText(p.default_price_kg),
           minKg: numberText(p.min_box_kg),
           maxKg: numberText(p.max_box_kg),
+          vat: String(Number(p.vat_rate)),
         });
         setLoaded(true);
       })
@@ -183,6 +193,17 @@ export default function ProductEditor({ org, productId, presetCode, presetSuppli
           </div>
           <p className="muted" style={{ margin: 0 }}>
             A faixa de peso serve para avisar quando a leitura parecer errada.
+          </p>
+          <label>
+            VAT
+            <select value={form.vat} onChange={set("vat")}>
+              <option value="0">0% · zero-rated (maioria da carne fresca)</option>
+              <option value="5">5% · taxa reduzida</option>
+              <option value="20">20% · taxa padrão</option>
+            </select>
+          </label>
+          <p className="muted" style={{ margin: 0 }}>
+            Confirme a taxa de cada produto com o contador antes de emitir invoices.
           </p>
           <label>
             Código interno (opcional)

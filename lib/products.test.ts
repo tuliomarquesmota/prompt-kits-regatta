@@ -11,6 +11,7 @@ const form = (o: Partial<ProductForm> = {}): ProductForm => ({
   price: "14,90",
   minKg: "15",
   maxKg: "30",
+  vat: "0",
   ...o,
 });
 
@@ -35,6 +36,7 @@ test("monta a linha do banco com campos vazios como null", () => {
     default_price_kg: 14.9,
     min_box_kg: 15,
     max_box_kg: 30,
+    vat_rate: 0,
   });
   const vazio = checkProduct(form({ price: "", minKg: "", maxKg: "" }));
   assert.ok(vazio.ok && vazio.row.default_price_kg === null && vazio.row.min_box_kg === null);
@@ -50,6 +52,7 @@ test("recusa nome vazio, número inválido e faixa de peso invertida", () => {
   assert.match(err(form({ minKg: "dez" })), /Peso inválido/);
   assert.match(err(form({ minKg: "30", maxKg: "15" })), /mínimo está maior/);
   assert.match(err(form({ maxKg: "150" })), /99 kg/);
+  assert.match(err(form({ vat: "17.5" })), /VAT/);
 });
 
 test("link de cadastro a partir da caixa lida", () => {

@@ -40,8 +40,29 @@ export type InvoiceDetail = {
   status: string;
   customer: { name: string; email: string | null };
   order: string | null;
-  lines: { product: string; boxes: number; weight_kg: number; price_kg: number; amount: number; lots: string[] }[];
+  vat_total: number;
+  lines: {
+    product: string;
+    boxes: number;
+    weight_kg: number;
+    price_kg: number;
+    amount: number;
+    lots: string[];
+    vat_rate: number;
+    vat_amount: number;
+  }[];
   credits: CreditNote[];
+  payments: Payment[];
+};
+
+export type Payment = { id: string; amount: number; paid_on: string; method: string; note: string | null };
+
+export const PAYMENT_METHODS: Record<string, string> = {
+  transferencia: "Transferência",
+  cartao: "Cartão",
+  dinheiro: "Dinheiro",
+  cheque: "Cheque",
+  outro: "Outro",
 };
 
 export type CreditNote = {
@@ -51,6 +72,7 @@ export type CreditNote = {
   reason: string | null;
   restocked: boolean;
   total: number;
+  vat_total: number;
   lines: { product: string; boxes: number; weight_kg: number; price_kg: number; amount: number }[];
 };
 
@@ -126,7 +148,7 @@ export async function listOrders(orgId: string): Promise<OrderSummary[]> {
   const { data, error } = await supabase()
     .from("sales_orders")
     .select(
-      "id, number, status, created_at, delivery_on, customers(name), sales_order_lines(boxes_requested, products(name)), shipments(invoices(id, number, total))",
+      "id, number, status, created_at, delivery_on, customers(name), sales_order_lines(boxes_requested, products(name)), shipments(invoices(id, number, total, vat_total))",
     )
     .eq("org_id", orgId)
     .order("created_at", { ascending: false })
@@ -135,7 +157,7 @@ export async function listOrders(orgId: string): Promise<OrderSummary[]> {
   return (data ?? []).map(o => {
     const lines = (o.sales_order_lines ?? []) as unknown as { boxes_requested: number; products: Named }[];
     const ship = one(o.shipments as unknown as { invoices: unknown }[]);
-    const inv = ship ? one(ship.invoices as { id: string; number: string; total: number }[]) : null;
+    const inv = ship ? one(ship.invoices as { id: string; number: string; total: number; vat_total: number }[]) : null;
     return {
       id: o.id,
       number: o.number,
@@ -144,7 +166,7 @@ export async function listOrders(orgId: string): Promise<OrderSummary[]> {
       delivery_on: o.delivery_on,
       customer: one(o.customers as unknown as Named)?.name ?? "—",
       items: lines.map(l => `${l.products?.name ?? "Produto"} ×${l.boxes_requested}`).join(", "),
-      invoice: inv ? { ...inv, total: Number(inv.total) } : null,
+      invoice: inv ? { id: inv.id, number: inv.number, total: Number(inv.total) + Number(inv.vat_total) } : null,
     };
   });
 }
@@ -238,7 +260,7 @@ export async function getInvoice(invoiceId: string): Promise<InvoiceDetail> {
   const { data, error } = await supabase()
     .from("invoices")
     .select(
-      "id, number, issued_on, due_on, total, status, customers(name, email), shipments(sales_orders(number)), invoice_lines(boxes, weight_kg, price_kg, amount, lots, products(name)), credit_notes(id, number, issued_on, reason, restocked, total, credit_note_lines(boxes, weight_kg, price_kg, amount, products(name)))",
+      "id, number, issued_on, due_on, total, vat_total, status, customers(name, email), shipments(sales_orders(number)), invoice_lines(boxes, weight_kg, price_kg, amount, lots, vat_rate, vat_amount, products(name)), payments(id, amount, paid_on, method, note), credit_notes(id, number, issued_on, reason, restocked, total, vat_total, credit_note_lines(boxes, weight_kg, price_kg, amount, products(name)))",
     )
     .eq("id", invoiceId)
     .single();
@@ -252,6 +274,8 @@ export async function getInvoice(invoiceId: string): Promise<InvoiceDetail> {
     price_kg: number;
     amount: number;
     lots: string[] | null;
+    vat_rate: number;
+    vat_amount: number;
     products: Named;
   }[];
   return {
@@ -260,6 +284,7 @@ export async function getInvoice(invoiceId: string): Promise<InvoiceDetail> {
     issued_on: data.issued_on,
     due_on: data.due_on,
     total: Number(data.total),
+    vat_total: Number(data.vat_total),
     status: data.status,
     customer: { name: cust?.name ?? "—", email: cust?.email ?? null },
     order: so?.number ?? null,
@@ -270,7 +295,12 @@ export async function getInvoice(invoiceId: string): Promise<InvoiceDetail> {
       price_kg: Number(l.price_kg),
       amount: Number(l.amount),
       lots: l.lots ?? [],
+      vat_rate: Number(l.vat_rate),
+      vat_amount: Number(l.vat_amount),
     })),
+    payments: ((data.payments ?? []) as unknown as Payment[])
+      .map(p => ({ ...p, amount: Number(p.amount) }))
+      .sort((a, b) => a.paid_on.localeCompare(b.paid_on)),
     credits: ((data.credit_notes ?? []) as unknown as RawCredit[])
       .map(c => ({
         id: c.id,
@@ -279,6 +309,7 @@ export async function getInvoice(invoiceId: string): Promise<InvoiceDetail> {
         reason: c.reason,
         restocked: c.restocked,
         total: Number(c.total),
+        vat_total: Number(c.vat_total),
         lines: (c.credit_note_lines ?? []).map(l => ({
           product: l.products?.name ?? "Produto",
           boxes: l.boxes,
@@ -298,6 +329,7 @@ type RawCredit = {
   reason: string | null;
   restocked: boolean;
   total: number;
+  vat_total: number;
   credit_note_lines: { boxes: number; weight_kg: number; price_kg: number; amount: number; products: Named }[] | null;
 };
 
@@ -362,4 +394,41 @@ export function errorText(e: unknown): string {
   if (/fetch|network|Failed to fetch/i.test(m))
     return "Sem internet. Vendas precisam de conexão; tente de novo quando conectar.";
   return m || "Algo deu errado. Tente de novo.";
+}
+
+export async function recordPayment(
+  invoiceId: string,
+  p: { amount: number; paid_on: string; method: string; note: string },
+): Promise<void> {
+  const { error } = await supabase().rpc("record_payment", {
+    invoice_id: invoiceId,
+    amount: p.amount,
+    paid_on: p.paid_on,
+    method: p.method,
+    note: p.note,
+  });
+  if (error) throw error;
+}
+
+export type OpenInvoice = {
+  id: string;
+  number: string;
+  customer_id: string;
+  customer: string;
+  issued_on: string;
+  due_on: string | null;
+  gross: number;
+  balance: number;
+};
+
+/** Invoices com saldo em aberto (view invoice_balances). */
+export async function openInvoices(orgId: string): Promise<OpenInvoice[]> {
+  const { data, error } = await supabase()
+    .from("invoice_balances")
+    .select("id, number, customer_id, customer, issued_on, due_on, gross, balance")
+    .eq("org_id", orgId)
+    .gt("balance", 0)
+    .order("due_on");
+  if (error) throw error;
+  return (data ?? []).map(r => ({ ...r, gross: Number(r.gross), balance: Number(r.balance) })) as OpenInvoice[];
 }

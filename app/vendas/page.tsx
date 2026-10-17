@@ -10,8 +10,9 @@ import Customers from "@/components/vendas/Customers";
 import NewOrder from "@/components/vendas/NewOrder";
 import Dispatch from "@/components/vendas/Dispatch";
 import InvoiceView from "@/components/vendas/InvoiceView";
+import Receivables from "@/components/vendas/Receivables";
 
-/** Vendas numa rota só: ?novo · ?clientes · ?pedido=ID (expedição) · ?invoice=ID */
+/** Vendas numa rota só: ?novo · ?clientes · ?receber · ?pedido=ID (expedição) · ?invoice=ID */
 function Vendas() {
   const router = useRouter();
   const params = useSearchParams();
@@ -36,6 +37,7 @@ function Vendas() {
   if (pedido) return <Dispatch orderId={pedido} org={org} go={go} />;
   if (params.has("novo")) return <NewOrder org={org} go={go} />;
   if (params.has("clientes")) return <Customers org={org} go={go} />;
+  if (params.has("receber")) return <Receivables org={org} go={go} />;
   return <OrdersList org={org} go={go} />;
 }
 

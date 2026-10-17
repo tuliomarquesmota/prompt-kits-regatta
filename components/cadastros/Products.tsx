@@ -76,6 +76,7 @@ export default function Products({ org, go }: Props) {
                 {p.min_box_kg !== null &&
                   p.max_box_kg !== null &&
                   ` · ${numberText(p.min_box_kg)}–${numberText(p.max_box_kg)} kg`}
+                {` · VAT ${Number(p.vat_rate)}%`}
               </span>
             </button>
           ))}

@@ -8,6 +8,7 @@ export type ProductForm = {
   price: string; // como a pessoa digitou: "14,90" ou "14.90"
   minKg: string;
   maxKg: string;
+  vat: string; // "0", "5" ou "20"
 };
 
 export type ProductRow = {
@@ -18,6 +19,7 @@ export type ProductRow = {
   default_price_kg: number | null;
   min_box_kg: number | null;
   max_box_kg: number | null;
+  vat_rate: number;
 };
 
 /** Lê número digitado com vírgula ou ponto. Vazio vira null; texto inválido vira NaN. */
@@ -42,6 +44,7 @@ export function checkProduct(f: ProductForm): { ok: true; row: ProductRow } | { 
   if (price !== null && price > 9999) return { ok: false, error: "Preço por kg alto demais. Confira o valor." };
   if ((minKg !== null && minKg > 99) || (maxKg !== null && maxKg > 99))
     return { ok: false, error: "Peso da caixa acima de 99 kg. Confira o valor." };
+  if (!["0", "5", "20"].includes(f.vat)) return { ok: false, error: "Escolha a taxa de VAT: 0%, 5% ou 20%." };
   if (minKg !== null && maxKg !== null && minKg > maxKg)
     return { ok: false, error: "O peso mínimo está maior que o máximo." };
   return {
@@ -54,6 +57,7 @@ export function checkProduct(f: ProductForm): { ok: true; row: ProductRow } | { 
       default_price_kg: price === null ? null : Math.round(price * 100) / 100,
       min_box_kg: minKg === null ? null : Math.round(minKg * 1000) / 1000,
       max_box_kg: maxKg === null ? null : Math.round(maxKg * 1000) / 1000,
+      vat_rate: Number(f.vat),
     },
   };
 }

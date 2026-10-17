@@ -136,7 +136,7 @@ export default function ReturnBoxes({ invoiceId, onDone, onCancel }: Props) {
                 </div>
               ))}
               <div className="row spread" style={{ fontWeight: 700, marginTop: 8 }}>
-                <span>Credit note</span>
+                <span>Credit note (sem VAT)</span>
                 <span className="mono">− {money(prev.total)}</span>
               </div>
             </div>

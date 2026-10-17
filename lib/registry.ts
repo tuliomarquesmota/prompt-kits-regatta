@@ -13,6 +13,7 @@ export type ProductItem = {
   default_price_kg: number | null;
   min_box_kg: number | null;
   max_box_kg: number | null;
+  vat_rate: number;
 };
 
 /** Mensagem clara para os erros mais comuns dos cadastros. */
@@ -33,7 +34,7 @@ export function registryError(e: unknown, what: "produto" | "fornecedor" | "câm
   return m || "Algo deu errado. Tente de novo.";
 }
 
-const productCols = "id, name, supplier_id, gtin, sku, default_price_kg, min_box_kg, max_box_kg";
+const productCols = "id, name, supplier_id, gtin, sku, default_price_kg, min_box_kg, max_box_kg, vat_rate";
 
 export async function listProducts(orgId: string): Promise<ProductItem[]> {
   const { data, error } = await supabase().from("products").select(productCols).eq("org_id", orgId).order("name");
