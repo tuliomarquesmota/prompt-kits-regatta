@@ -3,6 +3,7 @@ import { supabase } from "./supabase";
 import type { BillRow } from "./payables";
 import type { Payment } from "./sales";
 import type { AccountTotal, VatSums } from "./reports";
+import type { MarginRow } from "./costing";
 
 export type AccountType = "asset" | "liability" | "equity" | "income" | "expense";
 export type Account = {
@@ -247,5 +248,147 @@ export async function vatSums(orgId: string, from: string, to: string): Promise<
     credits_vat: n("credits_vat"),
     purchases_net: n("purchases_net"),
     purchases_vat: n("purchases_vat"),
+  };
+}
+
+export type ReceiptSummary = {
+  id: string;
+  received_at: string;
+  reference: string | null;
+  extra_costs: number;
+  costed_at: string | null;
+  boxes: number;
+  weight_kg: number;
+  products: string[];
+};
+
+export type ReceiptProductRow = {
+  product_id: string;
+  product: string;
+  boxes: number;
+  weight_kg: number;
+  price_kg: number | null;
+};
+
+/** Entregas recebidas (as mais recentes primeiro), com caixas e kg. */
+export async function listReceipts(orgId: string): Promise<ReceiptSummary[]> {
+  const sb = supabase();
+  const [rec, prod] = await Promise.all([
+    sb
+      .from("receipts")
+      .select("id, received_at, reference, extra_costs, costed_at")
+      .eq("org_id", orgId)
+      .order("received_at", { ascending: false })
+      .limit(200),
+    sb.from("receipt_products").select("receipt_id, product, boxes, weight_kg").eq("org_id", orgId).limit(5000),
+  ]);
+  if (rec.error) throw rec.error;
+  if (prod.error) throw prod.error;
+  return (rec.data ?? [])
+    .map(r => {
+      const items = (prod.data ?? []).filter(p => p.receipt_id === r.id);
+      return {
+        ...r,
+        extra_costs: Number(r.extra_costs),
+        boxes: items.reduce((s, p) => s + Number(p.boxes), 0),
+        weight_kg: items.reduce((s, p) => s + Math.round(Number(p.weight_kg) * 1000), 0) / 1000,
+        products: items.map(p => p.product as string),
+      };
+    })
+    .filter(r => r.boxes > 0);
+}
+
+export async function getReceipt(
+  receiptId: string,
+): Promise<{ summary: Omit<ReceiptSummary, "boxes" | "weight_kg" | "products">; rows: ReceiptProductRow[] }> {
+  const sb = supabase();
+  const [rec, prod] = await Promise.all([
+    sb.from("receipts").select("id, received_at, reference, extra_costs, costed_at").eq("id", receiptId).single(),
+    sb.from("receipt_products").select("product_id, product, boxes, weight_kg, price_kg").eq("receipt_id", receiptId),
+  ]);
+  if (rec.error) throw rec.error;
+  if (prod.error) throw prod.error;
+  return {
+    summary: { ...rec.data, extra_costs: Number(rec.data.extra_costs) },
+    rows: (prod.data ?? [])
+      .map(p => ({
+        product_id: p.product_id,
+        product: p.product,
+        boxes: Number(p.boxes),
+        weight_kg: Number(p.weight_kg),
+        price_kg: p.price_kg === null ? null : Number(p.price_kg),
+      }))
+      .sort((a, b) => a.product.localeCompare(b.product)),
+  };
+}
+
+export async function saveReceiptCosts(
+  receiptId: string,
+  prices: { product_id: string; price_kg: number }[],
+  extras: number,
+  reference: string,
+): Promise<void> {
+  const { error } = await supabase().rpc("set_receipt_costs", {
+    receipt: receiptId,
+    prices,
+    extras,
+    ref: reference,
+  });
+  if (error) throw error;
+}
+
+export async function marginRows(orgId: string, from: string, to: string): Promise<MarginRow[]> {
+  const { data, error } = await supabase()
+    .from("sale_margins")
+    .select(
+      "invoice_id, customer_id, customer, product_id, product, boxes, weight_kg, revenue, cost, boxes_without_cost",
+    )
+    .eq("org_id", orgId)
+    .gte("issued_on", from)
+    .lte("issued_on", to)
+    .limit(5000);
+  if (error) throw error;
+  return (data ?? []).map(r => ({
+    ...r,
+    boxes: Number(r.boxes),
+    weight_kg: Number(r.weight_kg),
+    revenue: Number(r.revenue),
+    cost: r.cost === null ? null : Number(r.cost),
+    boxes_without_cost: Number(r.boxes_without_cost),
+  })) as MarginRow[];
+}
+
+export async function marginForInvoice(invoiceId: string): Promise<MarginRow[]> {
+  const { data, error } = await supabase()
+    .from("sale_margins")
+    .select(
+      "invoice_id, customer_id, customer, product_id, product, boxes, weight_kg, revenue, cost, boxes_without_cost",
+    )
+    .eq("invoice_id", invoiceId);
+  if (error) throw error;
+  return (data ?? []).map(r => ({
+    ...r,
+    revenue: Number(r.revenue),
+    cost: r.cost === null ? null : Number(r.cost),
+    boxes: Number(r.boxes),
+    weight_kg: Number(r.weight_kg),
+    boxes_without_cost: Number(r.boxes_without_cost),
+  })) as MarginRow[];
+}
+
+export async function stockValue(
+  orgId: string,
+): Promise<{ value: number; boxes: number; boxes_without_cost: number; weight_kg: number }> {
+  const { data, error } = await supabase()
+    .from("stock_value")
+    .select("value, boxes, boxes_without_cost, weight_kg")
+    .eq("org_id", orgId)
+    .maybeSingle();
+  if (error) throw error;
+  return {
+    value: Number(data?.value ?? 0),
+    boxes: Number(data?.boxes ?? 0),
+    boxes_without_cost: Number(data?.boxes_without_cost ?? 0),
+    weight_kg: Number(data?.weight_kg ?? 0),
   };
 }

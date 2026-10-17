@@ -16,6 +16,8 @@ import {
 import { sumMoney } from "@/lib/receivables";
 import { getCompany } from "@/lib/registry";
 import { invoiceGaps, type Company } from "@/lib/company";
+import { marginForInvoice } from "@/lib/finance";
+import { marginBy } from "@/lib/costing";
 
 type Props = { invoiceId: string; org: Org; go: (q: string) => void };
 
@@ -70,6 +72,13 @@ export default function InvoiceView({ invoiceId, org, go }: Props) {
   const [panel, setPanel] = useState<"none" | "return" | "payment">("none");
   const [done, setDone] = useState<string | null>(null);
   const [company, setCompany] = useState<Company | null>(null);
+  const [margin, setMargin] = useState<ReturnType<typeof marginBy> | null>(null);
+
+  useEffect(() => {
+    marginForInvoice(invoiceId)
+      .then(rows => setMargin(rows.length ? marginBy(rows, "product") : null))
+      .catch(() => setMargin(null));
+  }, [invoiceId]);
 
   useEffect(() => {
     getCompany(org.id)
@@ -246,6 +255,32 @@ export default function InvoiceView({ invoiceId, org, go }: Props) {
           </p>
         )}
       </section>
+
+      {margin && (
+        <section className="panel no-print" aria-label="Margem desta venda">
+          <div className="row spread">
+            <strong>Margem desta venda</strong>
+            <span className="muted">só você vê</span>
+          </div>
+          {margin.total.revenue > 0 ? (
+            <div className="row spread" style={{ fontWeight: 700 }}>
+              <span>
+                Vendeu {money(margin.total.revenue)} · custou {money(margin.total.cost)}
+              </span>
+              <span className="mono" style={{ color: margin.total.margin < 0 ? "var(--bad-fg)" : undefined }}>
+                {money(margin.total.margin)}
+                {margin.total.pct !== null && ` · ${margin.total.pct}%`}
+              </span>
+            </div>
+          ) : null}
+          {margin.total.withoutCost > 0 && (
+            <span className="muted">
+              {margin.total.withoutCost} caixa{margin.total.withoutCost === 1 ? "" : "s"} sem custo. Lance em Finanças →
+              A pagar → Custo das entregas.
+            </span>
+          )}
+        </section>
+      )}
 
       {(() => {
         const gaps = invoiceGaps(company, inv.customer.address, inv.vat_total > 0);

@@ -16,6 +16,7 @@ import {
   type VatSums,
 } from "@/lib/reports";
 import { brDate, errorText, money } from "@/lib/sales";
+import Margins from "@/components/financas/Margins";
 
 type Props = { org: Org };
 type Data = { period: AccountTotal[]; toDate: AccountTotal[]; vat: VatSums };
@@ -118,6 +119,8 @@ export default function Reports({ org }: Props) {
 
       {error && <p className="note bad">{error}</p>}
       {!data && !error && <p className="muted">Calculando…</p>}
+
+      {data && <Margins orgId={org.id} from={range.from} to={range.to} label={range.label} />}
 
       {pl && (
         <section className="panel" aria-label="Resultado do período">

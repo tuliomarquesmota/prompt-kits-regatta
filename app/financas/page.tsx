@@ -13,6 +13,8 @@ import Accounts from "@/components/financas/Accounts";
 import Ledger from "@/components/financas/Ledger";
 import ManualEntry from "@/components/financas/ManualEntry";
 import Reports from "@/components/financas/Reports";
+import Receipts from "@/components/financas/Receipts";
+import ReceiptCost from "@/components/financas/ReceiptCost";
 
 const TABS = [
   { key: "", label: "A receber" },
@@ -47,6 +49,9 @@ function Financas() {
     router.push(q ? `/financas?${q}` : "/financas");
   };
 
+  const entrega = params.get("entrega");
+  if (tab === "pagar" && entrega) return <ReceiptCost key={entrega} org={org} receiptId={entrega} go={go} />;
+  if (tab === "pagar" && params.get("ver") === "entregas") return <Receipts org={org} go={go} />;
   if (tab === "pagar" && conta === "nova") return <NewBill org={org} go={go} />;
   if (tab === "pagar" && conta) return <BillView key={conta} billId={conta} org={org} go={go} />;
   const ver = params.get("ver");
