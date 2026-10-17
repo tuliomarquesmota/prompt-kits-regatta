@@ -1,0 +1,156 @@
+// Consultas do financeiro no Supabase: plano de contas e contas a pagar.
+import { supabase } from "./supabase";
+import type { BillRow } from "./payables";
+import type { Payment } from "./sales";
+
+export type AccountType = "asset" | "liability" | "equity" | "income" | "expense";
+export type Account = {
+  id: string;
+  code: string;
+  name: string;
+  type: AccountType;
+  system_key: string | null;
+  active: boolean;
+};
+
+export const ACCOUNT_TYPE: Record<AccountType, string> = {
+  asset: "Ativo",
+  liability: "Passivo",
+  equity: "Patrimônio",
+  income: "Receita",
+  expense: "Despesa",
+};
+
+export type BillSummary = {
+  id: string;
+  reference: string | null;
+  issued_on: string;
+  due_on: string | null;
+  status: "open" | "paid" | "void";
+  description: string | null;
+  payee: string;
+  account: string;
+  gross: number;
+  paid: number;
+  balance: number;
+};
+
+export type BillDetail = BillSummary & {
+  net: number;
+  vat_rate: number;
+  vat_amount: number;
+  payments: Payment[];
+};
+
+export async function listAccounts(orgId: string): Promise<Account[]> {
+  const { data, error } = await supabase()
+    .from("accounts")
+    .select("id, code, name, type, system_key, active")
+    .eq("org_id", orgId)
+    .order("code");
+  if (error) throw error;
+  return (data ?? []) as Account[];
+}
+
+export async function saveAccount(
+  orgId: string,
+  id: string | null,
+  row: { code: string; name: string; type: AccountType; active: boolean },
+): Promise<void> {
+  const sb = supabase();
+  const { error } = id
+    ? await sb.from("accounts").update(row).eq("id", id).eq("org_id", orgId)
+    : await sb.from("accounts").insert({ ...row, org_id: orgId });
+  if (error) throw error;
+}
+
+const num = (r: Record<string, unknown>, ...keys: string[]) => {
+  const out = { ...r };
+  for (const k of keys) out[k] = Number(r[k]);
+  return out;
+};
+
+export async function listBills(orgId: string, onlyOpen: boolean): Promise<BillSummary[]> {
+  let q = supabase()
+    .from("bill_balances")
+    .select("id, reference, issued_on, due_on, status, description, payee, account, gross, paid, balance")
+    .eq("org_id", orgId);
+  if (onlyOpen) q = q.gt("balance", 0);
+  const { data, error } = await q.order("due_on", { ascending: true, nullsFirst: false }).limit(500);
+  if (error) throw error;
+  return (data ?? []).map(r => num(r, "gross", "paid", "balance")) as BillSummary[];
+}
+
+export async function createBill(orgId: string, row: BillRow): Promise<string> {
+  const { data: s } = await supabase().auth.getSession();
+  const { data, error } = await supabase()
+    .from("bills")
+    .insert({ ...row, org_id: orgId, created_by: s.session?.user.id ?? null })
+    .select("id")
+    .single();
+  if (error) throw error;
+  return data.id as string;
+}
+
+export async function getBill(billId: string): Promise<BillDetail> {
+  const sb = supabase();
+  const [sum, raw, pays] = await Promise.all([
+    sb
+      .from("bill_balances")
+      .select("id, reference, issued_on, due_on, status, description, payee, account, gross, paid, balance")
+      .eq("id", billId)
+      .maybeSingle(),
+    sb.from("bills").select("net, vat_rate, vat_amount, status").eq("id", billId).single(),
+    sb.from("bill_payments").select("id, amount, paid_on, method, note").eq("bill_id", billId).order("paid_on"),
+  ]);
+  if (raw.error) throw raw.error;
+  if (sum.error) throw sum.error;
+  if (pays.error) throw pays.error;
+  // Conta anulada não aparece na view de saldos
+  const base = sum.data
+    ? (num(sum.data, "gross", "paid", "balance") as BillSummary)
+    : ({
+        id: billId,
+        reference: null,
+        issued_on: "",
+        due_on: null,
+        status: "void",
+        description: null,
+        payee: "—",
+        account: "—",
+        gross: 0,
+        paid: 0,
+        balance: 0,
+      } as BillSummary);
+  return {
+    ...base,
+    status: raw.data.status,
+    net: Number(raw.data.net),
+    vat_rate: Number(raw.data.vat_rate),
+    vat_amount: Number(raw.data.vat_amount),
+    payments: (pays.data ?? []).map(p => ({ ...p, amount: Number(p.amount) })) as Payment[],
+  };
+}
+
+export async function recordBillPayment(
+  billId: string,
+  p: { amount: number; paid_on: string; method: string; note: string },
+): Promise<void> {
+  const { error } = await supabase().rpc("record_bill_payment", {
+    bill_id: billId,
+    amount: p.amount,
+    paid_on: p.paid_on,
+    method: p.method,
+    note: p.note,
+  });
+  if (error) throw error;
+}
+
+/** Anula uma conta lançada errado. Só sem pagamentos. */
+export async function voidBill(orgId: string, billId: string): Promise<void> {
+  const sb = supabase();
+  const { count } = await sb.from("bill_payments").select("id", { count: "exact", head: true }).eq("bill_id", billId);
+  if (count) throw { message: "Esta conta já tem pagamento registrado e não pode ser anulada." };
+  const { error } = await sb.from("bills").update({ status: "void" }).eq("id", billId).eq("org_id", orgId);
+  if (error) throw error;
+}

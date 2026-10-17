@@ -7,13 +7,15 @@ const ITEMS = [
   { href: "/receber", label: "Receber" },
   { href: "/stock", label: "Stock" },
   { href: "/vendas", label: "Vendas" },
+  { href: "/financas", label: "Finanças" },
   { href: "/cadastros", label: "Cadastros" },
-  { href: "/equipe", label: "Equipe" },
 ];
 
 /** Barra com saudação e Sair, e o menu das telas principais, no topo de cada uma. */
 export default function Nav() {
   const path = usePathname();
+  // Equipe fica dentro de Cadastros
+  const active = (href: string) => path === href || (href === "/cadastros" && path === "/equipe");
   return (
     <>
       <TopBar />
@@ -22,8 +24,8 @@ export default function Nav() {
           <Link
             key={i.href}
             href={i.href}
-            className={path === i.href ? "on" : ""}
-            aria-current={path === i.href ? "page" : undefined}
+            className={active(i.href) ? "on" : ""}
+            aria-current={active(i.href) ? "page" : undefined}
           >
             {i.label}
           </Link>

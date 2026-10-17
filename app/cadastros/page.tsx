@@ -22,6 +22,7 @@ const TABS = [
   { key: "", label: "Produtos" },
   { key: "fornecedores", label: "Fornecedores" },
   { key: "camaras", label: "Câmaras" },
+  { key: "equipe", label: "Equipe" },
 ];
 
 /** Cadastros numa rota só: ?aba=fornecedores · ?aba=camaras · ?produto=novo|ID */
@@ -80,7 +81,7 @@ function Cadastros() {
             role="tab"
             aria-selected={tab === t.key}
             className={tab === t.key ? "on" : ""}
-            onClick={() => go(t.key ? `aba=${t.key}` : "")}
+            onClick={() => (t.key === "equipe" ? router.push("/equipe") : go(t.key ? `aba=${t.key}` : ""))}
           >
             {t.label}
           </button>

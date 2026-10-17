@@ -101,9 +101,14 @@ export default function EquipePage() {
   return (
     <main>
       <Nav />
-      <div>
-        <h1>Equipe</h1>
-        <div className="muted">{org?.name ?? "…"}</div>
+      <div className="row spread">
+        <div>
+          <h1>Equipe</h1>
+          <div className="muted">{org?.name ?? "…"}</div>
+        </div>
+        <button className="btn small" onClick={() => router.push("/cadastros")}>
+          ← Cadastros
+        </button>
       </div>
 
       {!online && <p className="note warn">Sem internet. A equipe só pode ser vista e alterada com conexão.</p>}

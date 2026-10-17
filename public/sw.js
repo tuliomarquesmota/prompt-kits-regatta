@@ -1,6 +1,6 @@
 // Service worker do LOTE: deixa o app abrir e ler etiquetas sem internet.
 // O envio dos dados é feito pela fila no IndexedDB (lib/sync.ts), não aqui.
-const CACHE = "lote-v5";
+const CACHE = "lote-v6";
 const SHELL = [
   "/receber",
   "/stock",
@@ -8,6 +8,7 @@ const SHELL = [
   "/login",
   "/equipe",
   "/cadastros",
+  "/financas",
   "/manifest.webmanifest",
   "/icon-192.png",
   "/icon-512.png",

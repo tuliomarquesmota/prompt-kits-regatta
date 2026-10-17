@@ -4,10 +4,11 @@ import type { Org } from "@/lib/offline-db";
 import { brDate, errorText, money, openInvoices, type OpenInvoice } from "@/lib/sales";
 import { BUCKET_TEXT, bucket, byCustomer, sumMoney, type CustomerDebt } from "@/lib/receivables";
 
-type Props = { org: Org; go: (q: string) => void };
+/** embedded: dentro de Finanças, sem título nem botão de voltar */
+type Props = { org: Org; go: (q: string) => void; embedded?: boolean };
 
 /** Contas a receber: quem deve, quanto e há quantos dias. */
-export default function Receivables({ org, go }: Props) {
+export default function Receivables({ org, go, embedded }: Props) {
   const [groups, setGroups] = useState<CustomerDebt<OpenInvoice>[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,12 +23,14 @@ export default function Receivables({ org, go }: Props) {
 
   return (
     <>
-      <div className="row spread">
-        <h1>A receber</h1>
-        <button className="btn small" onClick={() => go("")}>
-          ← Pedidos
-        </button>
-      </div>
+      {!embedded && (
+        <div className="row spread">
+          <h1>A receber</h1>
+          <button className="btn small" onClick={() => go("")}>
+            ← Pedidos
+          </button>
+        </div>
+      )}
 
       {error && <p className="note bad">{error}</p>}
       {!groups && !error && <p className="muted">Carregando…</p>}

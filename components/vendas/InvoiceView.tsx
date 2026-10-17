@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import ReturnBoxes from "@/components/vendas/ReturnBoxes";
+import PaymentForm from "@/components/PaymentForm";
 import type { Org } from "@/lib/offline-db";
 import {
   brDate,
@@ -12,7 +13,6 @@ import {
   recordPayment,
   type InvoiceDetail,
 } from "@/lib/sales";
-import { numberText, parseNumber } from "@/lib/products";
 import { sumMoney } from "@/lib/receivables";
 
 type Props = { invoiceId: string; org: Org; go: (q: string) => void };
@@ -213,8 +213,9 @@ export default function InvoiceView({ invoiceId, org, go }: Props) {
 
       {panel === "payment" && (
         <PaymentForm
-          invoiceId={inv.id}
+          title="Registrar pagamento"
           balance={t.balance}
+          save={p => recordPayment(inv.id, p)}
           onCancel={() => setPanel("none")}
           onDone={() => finish("Pagamento registrado.")}
         />
@@ -251,88 +252,5 @@ export default function InvoiceView({ invoiceId, org, go }: Props) {
         </>
       )}
     </>
-  );
-}
-
-function PaymentForm({
-  invoiceId,
-  balance,
-  onCancel,
-  onDone,
-}: {
-  invoiceId: string;
-  balance: number;
-  onCancel: () => void;
-  onDone: () => void;
-}) {
-  const today = new Date();
-  const iso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-  const [amount, setAmount] = useState(numberText(balance.toFixed(2)));
-  const [paidOn, setPaidOn] = useState(iso);
-  const [method, setMethod] = useState("transferencia");
-  const [note, setNote] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
-
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    const value = parseNumber(amount);
-    if (value === null || Number.isNaN(value) || value <= 0)
-      return setMsg("Valor inválido. Use só números, ex.: 324,37");
-    if (Math.round(value * 100) > Math.round(balance * 100))
-      return setMsg(`O valor passa do saldo em aberto (${money(balance)}).`);
-    setBusy(true);
-    setMsg(null);
-    try {
-      await recordPayment(invoiceId, { amount: value, paid_on: paidOn, method, note });
-      onDone();
-    } catch (err) {
-      setMsg(errorText(err));
-      setBusy(false);
-    }
-  }
-
-  return (
-    <form className="panel" onSubmit={submit} aria-label="Registrar pagamento">
-      <div className="row spread">
-        <strong>Registrar pagamento</strong>
-        <button type="button" className="btn small" onClick={onCancel} disabled={busy}>
-          Fechar
-        </button>
-      </div>
-      <label>
-        Valor recebido (£)
-        <input inputMode="decimal" value={amount} onChange={e => setAmount(e.target.value)} />
-      </label>
-      <span className="muted">
-        Saldo em aberto: {money(balance)}. Pode registrar um valor menor se o pagamento foi parcial.
-      </span>
-      <label>
-        Data do pagamento
-        <input type="date" value={paidOn} max={iso} onChange={e => setPaidOn(e.target.value)} />
-      </label>
-      <label>
-        Forma de pagamento
-        <select value={method} onChange={e => setMethod(e.target.value)}>
-          {Object.entries(PAYMENT_METHODS).map(([k, v]) => (
-            <option key={k} value={k}>
-              {v}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label>
-        Observação (opcional)
-        <input value={note} onChange={e => setNote(e.target.value)} placeholder="Ex.: referência do banco" />
-      </label>
-      <button className="btn primary" disabled={busy}>
-        {busy ? "Registrando…" : "Registrar pagamento"}
-      </button>
-      {msg && (
-        <p className="note bad" role="status">
-          {msg}
-        </p>
-      )}
-    </form>
   );
 }
