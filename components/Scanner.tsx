@@ -99,7 +99,7 @@ export default function Scanner({ onCodes, paused }: Props) {
       setError(
         name === "NotAllowedError"
           ? "A câmera foi bloqueada. Libere o acesso à câmera nas configurações do navegador."
-          : "Não consegui abrir a câmera. Use “Ler por foto”.",
+          : "Não consegui abrir a câmera. Use “Foto da galeria”.",
       );
     }
   }
@@ -150,12 +150,12 @@ export default function Scanner({ onCodes, paused }: Props) {
           className="btn"
           style={{ display: "inline-flex", justifyContent: "center", alignItems: "center", fontWeight: 600 }}
         >
-          Ler por foto
+          Foto da galeria
+          {/* Sem "capture": abre a galeria. A câmera ao vivo fica no botão ao lado. */}
           <input
             id="photo"
             type="file"
             accept="image/*"
-            capture="environment"
             hidden
             onChange={e => {
               fromPhoto(e.target.files?.[0]);
