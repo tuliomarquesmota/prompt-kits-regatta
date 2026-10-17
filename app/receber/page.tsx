@@ -4,10 +4,9 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 import Scanner from "@/components/Scanner";
-import LogoutButton from "@/components/LogoutButton";
 import { supabase } from "@/lib/supabase";
 import { getCatalog } from "@/lib/catalog";
-import { currentOrg, setCurrentOrg } from "@/lib/org";
+import { currentOrg } from "@/lib/org";
 import { daysUntil, readLabel, serialFromSecondCode, type Reading } from "@/lib/labels";
 import {
   listPending,
@@ -423,8 +422,6 @@ export default function ReceberPage() {
           </div>
         </div>
       </section>
-
-      <LogoutButton pending={pendingCount} />
     </main>
   );
 }

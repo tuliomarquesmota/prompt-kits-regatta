@@ -14,6 +14,7 @@ export default function LoginPage() {
   const [mode, setMode] = useState<"entrar" | "criar">("entrar");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [orgs, setOrgs] = useState<Org[]>([]);
   const [orgName, setOrgName] = useState("");
   const [seed, setSeed] = useState(true);
@@ -69,7 +70,11 @@ export default function LoginPage() {
       const { data, error } =
         mode === "entrar"
           ? await sb.auth.signInWithPassword({ email, password })
-          : await sb.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/login` } });
+          : await sb.auth.signUp({
+              email,
+              password,
+              options: { emailRedirectTo: `${window.location.origin}/login`, data: { name: name.trim() } },
+            });
       if (error) return setMsg({ text: traduz(error.message), tone: "bad" });
       // Usa a sessão que o login devolveu, sem consultar de novo
       if (!data.session)
@@ -103,6 +108,19 @@ export default function LoginPage() {
 
       {step === "auth" && (
         <form className="panel" onSubmit={submitAuth}>
+          {mode === "criar" && (
+            <label>
+              Seu nome
+              <input
+                id="name"
+                autoComplete="name"
+                required
+                value={name}
+                onChange={e => setName(e.target.value)}
+                placeholder="Como quer ser chamado"
+              />
+            </label>
+          )}
           <label>
             Email
             <input

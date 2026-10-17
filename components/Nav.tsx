@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import TopBar from "@/components/TopBar";
 
 const ITEMS = [
   { href: "/receber", label: "Receber" },
@@ -10,21 +11,24 @@ const ITEMS = [
   { href: "/equipe", label: "Equipe" },
 ];
 
-/** Menu das telas principais, no topo de cada uma. */
+/** Barra com saudação e Sair, e o menu das telas principais, no topo de cada uma. */
 export default function Nav() {
   const path = usePathname();
   return (
-    <nav aria-label="Telas" className="nav">
-      {ITEMS.map(i => (
-        <Link
-          key={i.href}
-          href={i.href}
-          className={path === i.href ? "on" : ""}
-          aria-current={path === i.href ? "page" : undefined}
-        >
-          {i.label}
-        </Link>
-      ))}
-    </nav>
+    <>
+      <TopBar />
+      <nav aria-label="Telas" className="nav">
+        {ITEMS.map(i => (
+          <Link
+            key={i.href}
+            href={i.href}
+            className={path === i.href ? "on" : ""}
+            aria-current={path === i.href ? "page" : undefined}
+          >
+            {i.label}
+          </Link>
+        ))}
+      </nav>
+    </>
   );
 }
