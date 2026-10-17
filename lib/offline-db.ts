@@ -18,9 +18,9 @@ export type Catalog = {
 export type PendingState = "pendente" | "enviando" | "duplicada" | "sem_produto" | "erro";
 
 export type PendingBox = {
-  id: string;              // id da caixa, gerado no celular (o envio pode ser repetido sem duplicar)
+  id: string; // id da caixa, gerado no celular (o envio pode ser repetido sem duplicar)
   orgId: string;
-  receiptId: string;       // sessão de recebimento
+  receiptId: string; // sessão de recebimento
   locationId: string | null;
   productId: string | null;
   reading: Reading;
@@ -49,12 +49,22 @@ function db() {
   return dbp;
 }
 
-export async function saveCatalog(c: Catalog) { await (await db()).put("catalog", c, c.org.id); }
-export async function loadCatalog(orgId: string) { return (await db()).get("catalog", orgId); }
+export async function saveCatalog(c: Catalog) {
+  await (await db()).put("catalog", c, c.org.id);
+}
+export async function loadCatalog(orgId: string) {
+  return (await db()).get("catalog", orgId);
+}
 
-export async function queueBox(b: PendingBox) { await (await db()).put("pending", b); }
-export async function updatePending(b: PendingBox) { await (await db()).put("pending", b); }
-export async function listPending(orgId: string) { return (await db()).getAllFromIndex("pending", "byOrg", orgId); }
+export async function queueBox(b: PendingBox) {
+  await (await db()).put("pending", b);
+}
+export async function updatePending(b: PendingBox) {
+  await (await db()).put("pending", b);
+}
+export async function listPending(orgId: string) {
+  return (await db()).getAllFromIndex("pending", "byOrg", orgId);
+}
 
 export async function markSent(b: PendingBox) {
   const d = await db();
@@ -63,8 +73,12 @@ export async function markSent(b: PendingBox) {
   await tx.objectStore("pending").delete(b.id);
   await tx.done;
 }
-export async function removePending(id: string) { await (await db()).delete("pending", id); }
-export async function listSent(receiptId: string) { return (await db()).getAllFromIndex("sent", "byReceipt", receiptId); }
+export async function removePending(id: string) {
+  await (await db()).delete("pending", id);
+}
+export async function listSent(receiptId: string) {
+  return (await db()).getAllFromIndex("sent", "byReceipt", receiptId);
+}
 
 /** A mesma caixa já foi lida neste celular (na fila ou já enviada)? */
 export async function seenOnDevice(productKey: string, serial: string | null): Promise<boolean> {

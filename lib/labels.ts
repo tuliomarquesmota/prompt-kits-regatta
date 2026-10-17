@@ -7,12 +7,12 @@ export type LabelMatch =
   | { tipo: "gs1"; prefixo_gtin: string }
   | {
       tipo: "molde";
-      chave: string;             // prefixo da chave do produto: "liffey" → "liffey:5300"
-      padrao: string;            // regex do código inteiro
+      chave: string; // prefixo da chave do produto: "liffey" → "liffey:5300"
+      padrao: string; // regex do código inteiro
       produto: [number, number]; // posições [início, fim) do código do produto
-      peso: [number, number];    // posições do peso
-      casas: number;             // casas decimais do peso
-      serial_itf?: boolean;      // um 2º código de 10 dígitos traz o número da caixa
+      peso: [number, number]; // posições do peso
+      casas: number; // casas decimais do peso
+      serial_itf?: boolean; // um 2º código de 10 dígitos traz o número da caixa
     };
 
 export type LabelRules = {
@@ -30,13 +30,13 @@ export type LabelProfile = {
 };
 
 export type Reading = {
-  productKey: string;            // casa com products.gtin
+  productKey: string; // casa com products.gtin
   supplierId: string | null;
   supplierName: string | null;
   profileId: string | null;
   netWeightKg: number | null;
-  packedOn: string | null;       // YYYY-MM-DD
-  useBy: string | null;          // YYYY-MM-DD
+  packedOn: string | null; // YYYY-MM-DD
+  useBy: string | null; // YYYY-MM-DD
   lot: string | null;
   serial: string | null;
   raw: string;
@@ -47,7 +47,9 @@ export type Reading = {
 const GS = "\u001d";
 
 function aiAt(s: string, i: number): { ai: string; len: number } | null {
-  const two = s.substr(i, 2), three = s.substr(i, 3), four = s.substr(i, 4);
+  const two = s.substr(i, 2),
+    three = s.substr(i, 3),
+    four = s.substr(i, 4);
   if (two === "00") return { ai: two, len: 18 };
   if (two === "01" || two === "02") return { ai: two, len: 14 };
   if (["11", "12", "13", "15", "16", "17"].includes(two)) return { ai: two, len: 6 };
@@ -73,13 +75,18 @@ export function parseGs1(input: string): Record<string, string> {
   if (s.startsWith(GS)) s = s.slice(1);
   let i = 0;
   while (i < s.length) {
-    if (s[i] === GS) { i++; continue; }
+    if (s[i] === GS) {
+      i++;
+      continue;
+    }
     const spec = aiAt(s, i);
     if (!spec) break;
     i += spec.ai.length;
     let value: string;
-    if (spec.len) { value = s.substr(i, spec.len); i += spec.len; }
-    else {
+    if (spec.len) {
+      value = s.substr(i, spec.len);
+      i += spec.len;
+    } else {
       const end = s.indexOf(GS, i);
       value = end < 0 ? s.slice(i) : s.slice(i, end);
       i = end < 0 ? s.length : end + 1;
@@ -91,11 +98,14 @@ export function parseGs1(input: string): Record<string, string> {
 
 function yymmdd(v?: string): Date | null {
   if (!v || !/^\d{6}$/.test(v)) return null;
-  const y = 2000 + Number(v.slice(0, 2)), m = Number(v.slice(2, 4)), d = Number(v.slice(4, 6)) || 1;
+  const y = 2000 + Number(v.slice(0, 2)),
+    m = Number(v.slice(2, 4)),
+    d = Number(v.slice(4, 6)) || 1;
   return new Date(Date.UTC(y, m - 1, d));
 }
 const iso = (d: Date | null) => (d ? d.toISOString().slice(0, 10) : null);
-const dayOfYear = (d: Date) => String(Math.round((d.getTime() - Date.UTC(d.getUTCFullYear(), 0, 0)) / 864e5)).padStart(3, "0");
+const dayOfYear = (d: Date) =>
+  String(Math.round((d.getTime() - Date.UTC(d.getUTCFullYear(), 0, 0)) / 864e5)).padStart(3, "0");
 
 function lotFromRule(rules: LabelRules, base: Date | null, ai10?: string): string | null {
   if (ai10) return ai10;
@@ -108,7 +118,8 @@ function lotFromRule(rules: LabelRules, base: Date | null, ai10?: string): strin
 function checkWeight(rules: LabelRules, kg: number | null, warnings: string[]) {
   if (kg == null || !rules.peso_kg) return;
   const [min, max] = rules.peso_kg;
-  if (kg < min || kg > max) warnings.push(`Peso fora da faixa normal deste fornecedor (${min}–${max} kg). Confira a etiqueta.`);
+  if (kg < min || kg > max)
+    warnings.push(`Peso fora da faixa normal deste fornecedor (${min}–${max} kg). Confira a etiqueta.`);
 }
 
 function readGs1(raw: string, profiles: LabelProfile[]): Reading | null {

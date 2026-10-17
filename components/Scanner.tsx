@@ -8,14 +8,22 @@ import { BarcodeFormat, DecodeHintType } from "@zxing/library";
 type Detected = { rawValue: string };
 type Detector = { detect(src: CanvasImageSource): Promise<Detected[]> };
 declare global {
-  interface Window { BarcodeDetector?: new (o: { formats: string[] }) => Detector }
+  interface Window {
+    BarcodeDetector?: new (o: { formats: string[] }) => Detector;
+  }
 }
 
 const FORMATS = ["code_128", "itf", "data_matrix", "qr_code", "ean_13"];
 
 function zxingReader() {
   const hints = new Map();
-  hints.set(DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.CODE_128, BarcodeFormat.ITF, BarcodeFormat.DATA_MATRIX, BarcodeFormat.QR_CODE, BarcodeFormat.EAN_13]);
+  hints.set(DecodeHintType.POSSIBLE_FORMATS, [
+    BarcodeFormat.CODE_128,
+    BarcodeFormat.ITF,
+    BarcodeFormat.DATA_MATRIX,
+    BarcodeFormat.QR_CODE,
+    BarcodeFormat.EAN_13,
+  ]);
   hints.set(DecodeHintType.ASSUME_GS1, true);
   hints.set(DecodeHintType.TRY_HARDER, true);
   return new BrowserMultiFormatReader(hints, { delayBetweenScanAttempts: 120 });
@@ -51,7 +59,10 @@ export default function Scanner({ onCodes, paused }: Props) {
     setError(null);
     try {
       if (window.BarcodeDetector) {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment", width: { ideal: 1920 } }, audio: false });
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "environment", width: { ideal: 1920 } },
+          audio: false,
+        });
         const v = video.current!;
         v.srcObject = stream;
         await v.play();
@@ -62,29 +73,42 @@ export default function Scanner({ onCodes, paused }: Props) {
           try {
             const found = await det.detect(v);
             if (found.length) emit(found.map(f => f.rawValue));
-          } catch { /* quadro ainda não pronto */ }
+          } catch {
+            /* quadro ainda não pronto */
+          }
           setTimeout(loop, 150);
         };
         loop();
-        stopRef.current = () => { alive = false; stream.getTracks().forEach(t => t.stop()); };
+        stopRef.current = () => {
+          alive = false;
+          stream.getTracks().forEach(t => t.stop());
+        };
       } else {
         const controls: IScannerControls = await zxingReader().decodeFromConstraints(
           { video: { facingMode: "environment", width: { ideal: 1920 } }, audio: false },
           video.current!,
-          result => { if (result) emit([result.getText()]); },
+          result => {
+            if (result) emit([result.getText()]);
+          },
         );
         stopRef.current = () => controls.stop();
       }
       setOn(true);
     } catch (e) {
       const name = (e as Error).name;
-      setError(name === "NotAllowedError"
-        ? "A câmera foi bloqueada. Libere o acesso à câmera nas configurações do navegador."
-        : "Não consegui abrir a câmera. Use “Ler por foto”.");
+      setError(
+        name === "NotAllowedError"
+          ? "A câmera foi bloqueada. Libere o acesso à câmera nas configurações do navegador."
+          : "Não consegui abrir a câmera. Use “Ler por foto”.",
+      );
     }
   }
 
-  function stop() { stopRef.current(); stopRef.current = () => {}; setOn(false); }
+  function stop() {
+    stopRef.current();
+    stopRef.current = () => {};
+    setOn(false);
+  }
 
   useEffect(() => () => stopRef.current(), []);
 
@@ -113,15 +137,38 @@ export default function Scanner({ onCodes, paused }: Props) {
         <div className="aim" />
       </div>
       <div className="row">
-        {on
-          ? <button className="btn" onClick={stop}>Parar câmera</button>
-          : <button className="btn primary" onClick={start}>Abrir câmera</button>}
-        <label className="btn" style={{ display: "inline-flex", justifyContent: "center", alignItems: "center", fontWeight: 600 }}>
+        {on ? (
+          <button className="btn" onClick={stop}>
+            Parar câmera
+          </button>
+        ) : (
+          <button className="btn primary" onClick={start}>
+            Abrir câmera
+          </button>
+        )}
+        <label
+          className="btn"
+          style={{ display: "inline-flex", justifyContent: "center", alignItems: "center", fontWeight: 600 }}
+        >
           Ler por foto
-          <input id="photo" type="file" accept="image/*" capture="environment" hidden onChange={e => { fromPhoto(e.target.files?.[0]); e.target.value = ""; }} />
+          <input
+            id="photo"
+            type="file"
+            accept="image/*"
+            capture="environment"
+            hidden
+            onChange={e => {
+              fromPhoto(e.target.files?.[0]);
+              e.target.value = "";
+            }}
+          />
         </label>
       </div>
-      {error && <p className="note bad" role="alert">{error}</p>}
+      {error && (
+        <p className="note bad" role="alert">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

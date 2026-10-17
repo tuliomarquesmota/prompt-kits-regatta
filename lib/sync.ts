@@ -17,22 +17,36 @@ export async function syncPending(catalog: Catalog): Promise<SyncResult> {
     const { data: session } = await sb.auth.getSession();
     if (!session.session) return result;
 
-    const queue = (await listPending(catalog.org.id)).filter(b => b.state === "pendente" || b.state === "erro" || b.state === "sem_produto");
+    const queue = (await listPending(catalog.org.id)).filter(
+      b => b.state === "pendente" || b.state === "erro" || b.state === "sem_produto",
+    );
     const receipts = new Set<string>();
 
     for (const box of queue) {
       // Produto cadastrado depois da leitura? Tenta casar de novo com o catálogo atual.
       const productId = box.productId ?? catalog.products.find(p => p.gtin === box.reading.productKey)?.id ?? null;
       if (!productId) {
-        await updatePending({ ...box, state: "sem_produto", error: "Produto não cadastrado para " + box.reading.productKey });
+        await updatePending({
+          ...box,
+          state: "sem_produto",
+          error: "Produto não cadastrado para " + box.reading.productKey,
+        });
         result.noProduct++;
         continue;
       }
 
       if (!receipts.has(box.receiptId)) {
-        const { error } = await sb.from("receipts")
-          .upsert({ id: box.receiptId, org_id: box.orgId, received_by: session.session.user.id }, { onConflict: "id", ignoreDuplicates: true });
-        if (error) { await fail(box, error.message); result.errors++; continue; }
+        const { error } = await sb
+          .from("receipts")
+          .upsert(
+            { id: box.receiptId, org_id: box.orgId, received_by: session.session.user.id },
+            { onConflict: "id", ignoreDuplicates: true },
+          );
+        if (error) {
+          await fail(box, error.message);
+          result.errors++;
+          continue;
+        }
         receipts.add(box.receiptId);
       }
 
@@ -55,16 +69,31 @@ export async function syncPending(catalog: Catalog): Promise<SyncResult> {
         raw_barcode: r.raw,
       });
 
-      if (!error) { await markSent({ ...box, productId }); result.sent++; continue; }
+      if (!error) {
+        await markSent({ ...box, productId });
+        result.sent++;
+        continue;
+      }
 
       if (error.code === "23505") {
         // Conflito: ou esta caixa já foi enviada antes (mesmo id), ou outro celular já leu o mesmo serial.
         const { data: same } = await sb.from("boxes").select("id").eq("id", box.id).maybeSingle();
-        if (same) { await markSent({ ...box, productId }); result.sent++; }
-        else { await updatePending({ ...box, productId, state: "duplicada", error: "Esta caixa já está no stock (lida por outro aparelho)." }); result.duplicates++; }
+        if (same) {
+          await markSent({ ...box, productId });
+          result.sent++;
+        } else {
+          await updatePending({
+            ...box,
+            productId,
+            state: "duplicada",
+            error: "Esta caixa já está no stock (lida por outro aparelho).",
+          });
+          result.duplicates++;
+        }
         continue;
       }
-      await fail(box, error.message); result.errors++;
+      await fail(box, error.message);
+      result.errors++;
     }
   } finally {
     running = false;

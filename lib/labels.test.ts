@@ -4,15 +4,35 @@ import assert from "node:assert/strict";
 import { readLabel, serialFromSecondCode, type LabelProfile } from "./labels.ts";
 
 const profiles: LabelProfile[] = [
-  { id: "teys", supplier_id: "s1", supplier_name: "Teys Australia",
+  {
+    id: "teys",
+    supplier_id: "s1",
+    supplier_name: "Teys Australia",
     match: { tipo: "gs1", prefixo_gtin: "9332218" },
-    rules: { shelf_dias: 140, lote: { regra: "aaddd" }, peso_kg: [10, 35] } },
-  { id: "sff", supplier_id: "s2", supplier_name: "Silver Fern Farms",
+    rules: { shelf_dias: 140, lote: { regra: "aaddd" }, peso_kg: [10, 35] },
+  },
+  {
+    id: "sff",
+    supplier_id: "s2",
+    supplier_name: "Silver Fern Farms",
     match: { tipo: "gs1", prefixo_gtin: "9418220" },
-    rules: { shelf_dias: 120, lote: { regra: "ddd", prefixo: "BG" }, peso_kg: [10, 35] } },
-  { id: "liffey", supplier_id: "s3", supplier_name: "Liffey Meats",
-    match: { tipo: "molde", chave: "liffey", padrao: "^\\d{10}$", produto: [0, 4], peso: [4, 8], casas: 2, serial_itf: true },
-    rules: { peso_kg: [5, 35] } },
+    rules: { shelf_dias: 120, lote: { regra: "ddd", prefixo: "BG" }, peso_kg: [10, 35] },
+  },
+  {
+    id: "liffey",
+    supplier_id: "s3",
+    supplier_name: "Liffey Meats",
+    match: {
+      tipo: "molde",
+      chave: "liffey",
+      padrao: "^\\d{10}$",
+      produto: [0, 4],
+      peso: [4, 8],
+      casas: 2,
+      serial_itf: true,
+    },
+    rules: { peso_kg: [5, 35] },
+  },
 ];
 
 test("Teys · Oyster Blade (formato com parênteses)", () => {

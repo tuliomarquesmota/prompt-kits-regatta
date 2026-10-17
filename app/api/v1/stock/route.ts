@@ -19,17 +19,29 @@ export async function GET(req: Request) {
   const key = req.headers.get("x-api-key");
   if (!key) return Response.json({ error: "Envie a chave no cabeçalho x-api-key." }, { status: 401, headers: cors });
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL, anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !anon) return Response.json({ error: "Servidor sem configuração do Supabase." }, { status: 500, headers: cors });
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL,
+    anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !anon)
+    return Response.json({ error: "Servidor sem configuração do Supabase." }, { status: 500, headers: cors });
 
   const sb = createClient(url, anon, { auth: { persistSession: false } });
   const { data, error } = await sb.rpc("public_stock", { api_key: key });
   if (error) {
     const invalid = error.code === "28000";
-    return Response.json({ error: invalid ? "Chave inválida ou revogada." : "Erro ao consultar o stock." }, { status: invalid ? 401 : 500, headers: cors });
+    return Response.json(
+      { error: invalid ? "Chave inválida ou revogada." : "Erro ao consultar o stock." },
+      { status: invalid ? 401 : 500, headers: cors },
+    );
   }
 
-  type Row = { product: string; sku: string | null; gtin: string | null; boxes: number; total_kg: number; next_use_by: string | null };
+  type Row = {
+    product: string;
+    sku: string | null;
+    gtin: string | null;
+    boxes: number;
+    total_kg: number;
+    next_use_by: string | null;
+  };
   const products = (data as Row[]).map(r => ({
     product: r.product,
     sku: r.sku,

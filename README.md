@@ -3,6 +3,13 @@
 App de celular para receber caixas de carne por scan, **com ou sem internet**.
 Lê a etiqueta do frigorífico, registra peso, lote, validade e número da caixa, e manda tudo para o banco quando houver conexão.
 
+> **Antes de mexer no código, leia:**
+>
+> - [`AGENTS.md`](AGENTS.md): as regras do projeto, para pessoas e para qualquer IA (Claude, ChatGPT)
+> - [`CONTRIBUTING.md`](CONTRIBUTING.md): como trabalhamos (branch → Pull Request → revisão)
+> - [`docs/usar-com-ia.md`](docs/usar-com-ia.md): como configurar o Claude ou o ChatGPT para seguir as regras
+> - [`docs/plano.md`](docs/plano.md) e [`docs/etiquetas.md`](docs/etiquetas.md): plano de fases e etiquetas dos fornecedores
+
 ## O que já funciona
 
 - **Login e empresas**: cada empresa só vê os próprios dados (Row Level Security no banco)
@@ -56,17 +63,21 @@ supabase/migrations/     banco de dados
 Cada fornecedor tem uma linha em `label_profiles`:
 
 **GS1** (a maioria dos exportadores):
+
 ```json
 match: {"tipo":"gs1","prefixo_gtin":"9332218"}
 rules: {"shelf_dias":140,"lote":{"regra":"aaddd"},"peso_kg":[10,35]}
 ```
+
 O prefixo é o que vem depois do primeiro dígito do código `(01)`.
 `lote.regra`: `ai10` (o código traz o lote), `aaddd` (ano + dia do ano), `ddd` (prefixo + dia do ano).
 
 **Código próprio** (lido por posição):
+
 ```json
 match: {"tipo":"molde","chave":"liffey","padrao":"^\\d{10}$","produto":[0,4],"peso":[4,8],"casas":2,"serial_itf":true}
 ```
+
 O produto correspondente tem `gtin = "liffey:5300"`.
 
 Depois de cadastrar, adicione o caso em `lib/labels.test.ts` com um código real.
@@ -83,8 +94,19 @@ Depois de cadastrar, adicione o caso em `lib/labels.test.ts` com um código real
    curl -H "x-api-key: lote_..." https://SEU-APP.vercel.app/api/v1/stock
    ```
    ```json
-   { "updated_at": "…", "products": [
-     { "product": "Oyster Blade", "gtin": "99332218350849", "in_stock": true, "boxes": 12, "total_kg": 258.4, "next_use_by": "2026-11-15" } ] }
+   {
+     "updated_at": "…",
+     "products": [
+       {
+         "product": "Oyster Blade",
+         "gtin": "99332218350849",
+         "in_stock": true,
+         "boxes": 12,
+         "total_kg": 258.4,
+         "next_use_by": "2026-11-15"
+       }
+     ]
+   }
    ```
 
 ## Próximos passos

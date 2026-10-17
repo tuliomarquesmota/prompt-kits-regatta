@@ -23,8 +23,11 @@ export async function refreshCatalog(org: Org): Promise<Catalog> {
   const catalog: Catalog = {
     org,
     profiles: (profiles.data ?? []).map(p => ({
-      id: p.id, supplier_id: p.supplier_id, supplier_name: supplierName.get(p.supplier_id) ?? "Fornecedor",
-      match: p.match, rules: p.rules,
+      id: p.id,
+      supplier_id: p.supplier_id,
+      supplier_name: supplierName.get(p.supplier_id) ?? "Fornecedor",
+      match: p.match,
+      rules: p.rules,
     })) as LabelProfile[],
     products: products.data ?? [],
     locations: locations.data ?? [],
@@ -38,7 +41,11 @@ export async function refreshCatalog(org: Org): Promise<Catalog> {
 export async function getCatalog(org: Org, online: boolean): Promise<Catalog | null> {
   const cached = await loadCatalog(org.id);
   if (online) {
-    try { return await refreshCatalog(org); } catch { return cached ?? null; }
+    try {
+      return await refreshCatalog(org);
+    } catch {
+      return cached ?? null;
+    }
   }
   return cached ?? null;
 }

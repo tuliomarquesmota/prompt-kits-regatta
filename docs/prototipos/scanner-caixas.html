@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+</head>
+<body>
+<title>Scanner de Caixas</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one mobile column — capture actions, result card, session list. Widens to two columns on desktop. */
+:root{
+  --bg:#F3F2EF; --surface:#FFFFFF; --fg:#1B1D20; --muted:#5C6168; --line:#E1DED9;
+  --accent:#8E2A35; --accent-fg:#FFFFFF; --accent-soft:#F4E6E8;
+  --ok-bg:#E2EFE7; --ok-fg:#245740; --warn-bg:#FBEFD9; --warn-fg:#7A4700; --bad-bg:#F8E3E4; --bad-fg:#8C1F27; --info-bg:#E4EAF4; --info-fg:#24406E;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141517; --surface:#1D1F22; --fg:#ECEDEE; --muted:#A3A8AF; --line:#2F3236;
+  --accent:#C9545F; --accent-fg:#FFFFFF; --accent-soft:#3A2226;
+  --ok-bg:#1E3329; --ok-fg:#8FD1AE; --warn-bg:#3A2D14; --warn-fg:#F2C77A; --bad-bg:#3D1E21; --bad-fg:#F2A3A8; --info-bg:#1E2A3D; --info-fg:#A9C2EA;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141517; --surface:#1D1F22; --fg:#ECEDEE; --muted:#A3A8AF; --line:#2F3236;
+  --accent:#C9545F; --accent-fg:#FFFFFF; --accent-soft:#3A2226;
+  --ok-bg:#1E3329; --ok-fg:#8FD1AE; --warn-bg:#3A2D14; --warn-fg:#F2C77A; --bad-bg:#3D1E21; --bad-fg:#F2A3A8; --info-bg:#1E2A3D; --info-fg:#A9C2EA;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{display:flex;align-items:center;gap:12px}
+.mark{width:34px;height:34px;border-radius:8px;background:var(--accent);display:grid;place-items:center;flex:none}
+h1{margin:0;font-size:22px;font-weight:600;text-wrap:balance}
+.sub{margin:0;color:var(--muted);font-size:14px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:18px;align-items:start}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel h2{margin:0;font-size:16px;font-weight:600}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bigbtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:104px;border-radius:12px;cursor:pointer;font:inherit;font-weight:600;font-size:15px;text-align:center;padding:12px;border:0}
+.bigbtn.primary{background:var(--accent);color:var(--accent-fg)}
+.bigbtn.secondary{background:var(--surface);color:var(--fg);border:1px solid var(--line)}
+.bigbtn:focus-within,.btn:focus-visible,.tbtn:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.bigbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.manual{display:flex;gap:8px}
+.manual input{flex:1;min-width:0;font-family:var(--mono);font-size:13px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);min-height:44px}
+.btn{font:inherit;font-weight:600;font-size:14px;border-radius:8px;cursor:pointer;min-height:44px;padding:0 16px;border:1px solid var(--line);background:var(--surface);color:var(--fg)}
+.btn.acc{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.tbtn{font:inherit;font-size:13px;background:none;border:0;color:var(--accent);cursor:pointer;padding:6px 4px;min-height:36px;text-decoration:underline;text-underline-offset:3px}
+.preview{border-radius:10px;overflow:hidden;border:1px solid var(--line);max-height:220px;display:flex;align-items:center;justify-content:center;background:var(--bg)}
+.preview img{max-width:100%;max-height:220px;object-fit:contain;display:block}
+.state{font-size:14px;padding:10px 12px;border-radius:8px}
+.pill{display:inline-block;font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;white-space:nowrap}
+.ok{background:var(--ok-bg);color:var(--ok-fg)} .warn{background:var(--warn-bg);color:var(--warn-fg)} .bad{background:var(--bad-bg);color:var(--bad-fg)} .info{background:var(--info-bg);color:var(--info-fg)}
+.res-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.prod{font-size:19px;font-weight:600}
+.kgbig{font-family:var(--mono);font-size:34px;font-weight:500;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+dl{margin:0;display:flex;flex-direction:column}
+.row{display:flex;justify-content:space-between;gap:14px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.row dt{color:var(--muted)} .row dd{margin:0;font-family:var(--mono);font-size:13px;text-align:right;word-break:break-all}
+.ai{font-family:var(--mono);font-size:12px;color:var(--accent);margin-right:4px}
+.raw{font-family:var(--mono);font-size:12px;color:var(--muted);word-break:break-all}
+.list{display:flex;flex-direction:column}
+.item{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+.item .m{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.item .w{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.tot{display:flex;justify-content:space-between;gap:12px;font-weight:600;padding-top:6px}
+.tot span:last-child{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.empty{color:var(--muted);font-size:14px;padding:12px 0}
+.foot{display:flex;gap:8px;flex-wrap:wrap}
+.note{font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.flash{animation:fl .6s ease-out}@keyframes fl{from{background:var(--accent-soft)}to{background:transparent}}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="mark" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M3 7V4h3M21 7V4h-3M3 17v3h3M21 17v3h-3"/><path d="M7 8v8M10 8v8M13 8v8M16 8v8"/></svg></div>
+    <div>
+      <h1>Scanner de Caixas</h1>
+      <p class="sub">Leia a etiqueta GS1-128 do frigorífico: peso, lote, validade e serial em um scan.</p>
+    </div>
+  </header>
+
+  <div class="cols">
+    <section class="panel" aria-labelledby="cap">
+      <h2 id="cap">Ler etiqueta</h2>
+      <div class="actions">
+        <label class="bigbtn primary">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+          Abrir câmera
+          <input id="cam" type="file" accept="image/*" capture="environment">
+        </label>
+        <label class="bigbtn secondary">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4M7 9l5-5 5 5"/><path d="M4 15v5h16v-5"/></svg>
+          Enviar foto
+          <input id="up" type="file" accept="image/*">
+        </label>
+      </div>
+      <p class="note">No celular, “Abrir câmera” abre a câmera traseira. Fotografe a etiqueta de frente, com o código de barras inteiro e nítido.</p>
+      <div id="prevWrap" class="preview" hidden><img id="prev" alt="Foto da etiqueta enviada"></div>
+      <div id="status" class="state info" role="status" hidden></div>
+      <form id="mform" class="manual" autocomplete="off">
+        <label for="manual" class="sr" hidden>Código</label>
+        <input id="manual" placeholder="Ou digite/cole o código, ex.: (01)…(3102)…" aria-label="Digitar ou colar o código">
+        <button class="btn" type="submit">Ler</button>
+      </form>
+      <div><button class="tbtn" id="exBtn" type="button">Carregar exemplo (caixa Teys, Austrália)</button></div>
+    </section>
+
+    <section class="panel" aria-labelledby="resT" id="resPanel">
+      <div class="res-head">
+        <h2 id="resT">Resultado</h2>
+        <span id="resPill" class="pill info">Aguardando</span>
+      </div>
+      <div id="result">
+        <p class="empty">Tire uma foto ou envie a imagem da etiqueta para ver peso, lote e validade.</p>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel" aria-labelledby="sesT">
+    <div class="res-head">
+      <h2 id="sesT">Caixas lidas nesta sessão</h2>
+      <span id="count" class="pill info">0 caixas</span>
+    </div>
+    <div id="list" class="list"><p class="empty">Nenhuma caixa ainda. Cada leitura válida entra aqui; o mesmo serial não entra duas vezes.</p></div>
+    <div class="tot" id="tot" hidden><span>Peso total</span><span id="totKg"></span></div>
+    <div class="foot">
+      <button class="btn" id="copyBtn" type="button">Copiar lista (CSV)</button>
+      <button class="btn" id="clearBtn" type="button">Limpar sessão</button>
+    </div>
+    <p class="note" id="copyMsg" role="status"></p>
+  </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js"></script>
+<script>
+(function(){
+const TODAY = (()=>{const d=new Date();return Date.UTC(d.getFullYear(),d.getMonth(),d.getDate());})();
+const EXAMPLE = '(01)99332218350849(3102)002177(13)260226(21)050018580273';
+
+// Perfis de etiqueta por fornecedor (GS1): reconhecidos pelo prefixo da empresa dentro do GTIN.
+// shelf = dias de validade a partir da data do código; lot = regra quando o código não traz (10).
+const PROFILES = [
+  {prefix:'9332218', supplier:'Teys Australia', shelf:140, lot:{rule:'yyddd'}, kg:[10,35]},
+  {prefix:'9418220', supplier:'Silver Fern Farms (NZ)', shelf:120, lot:{rule:'ddd', pre:'BG'}, kg:[10,35]}
+];
+const PRODUCTS = {
+  '99332218350849': 'Oyster Blade',
+  '99332218350528': 'Inside (topside)',
+  '99418220391152': 'PS-D Rump'
+};
+// Fornecedores com código próprio (sem GS1): molde por posições.
+const TEMPLATES = [
+  {supplier:'Liffey Meats (IE)', re:/^(\d{4})(\d{4})(\d{2})$/, products:{'5300':'Rumps Caps'},
+   read:m=>({code:m[1], weight:+m[2]/100}), note:'Validade e lote não estão no código: confira na etiqueta.'}
+];
+
+// ---------- GS1 parsing ----------
+const GS = '\u001d';
+function aiSpec(s,i){
+  const two=s.substr(i,2), three=s.substr(i,3), four=s.substr(i,4);
+  if(['00'].includes(two)) return {ai:two,len:18};
+  if(['01','02'].includes(two)) return {ai:two,len:14};
+  if(['11','12','13','15','16','17'].includes(two)) return {ai:two,len:6};
+  if(two==='20') return {ai:two,len:2};
+  if(['10','21','22','30','37'].includes(two) || /^9\d$/.test(two)) return {ai:two,len:0};
+  if(/^3[1-6]\d\d$/.test(four)) return {ai:four,len:6};
+  if(/^41\d$/.test(three)) return {ai:three,len:13};
+  if(/^(24\d|25\d|40\d|42\d)$/.test(three)) return {ai:three,len:0};
+  if(four==='7003') return {ai:four,len:10};
+  if(/^70\d\d$/.test(four)) return {ai:four,len:0};
+  return null;
+}
+function parseElements(input){
+  let s=(input||'').trim();
+  const out={};
+  if(!s) return out;
+  if(s.includes('(')){
+    const re=/\((\d{2,4})\)([^(]*)/g; let m;
+    while((m=re.exec(s))) out[m[1]]=m[2].replace(/\u001d/g,'').trim();
+    return out;
+  }
+  s=s.replace(/^\]C1|^\]e0|^\]d2|^\]Q3/,'').replace(/^\u001d/,'');
+  let i=0;
+  while(i<s.length){
+    if(s[i]===GS){i++;continue;}
+    const sp=aiSpec(s,i); if(!sp) break;
+    i+=sp.ai.length;
+    let v;
+    if(sp.len){v=s.substr(i,sp.len);i+=sp.len;}
+    else{const j=s.indexOf(GS,i);v=j<0?s.slice(i):s.slice(i,j);i=j<0?s.length:j+1;}
+    out[sp.ai]=v;
+  }
+  return out;
+}
+function ymd(v){if(!/^\d{6}$/.test(v))return null;const y=2000+ +v.slice(0,2),m=+v.slice(2,4),d=+v.slice(4,6)||1;return Date.UTC(y,m-1,d);}
+function fmtD(t){const d=new Date(t);return String(d.getUTCDate()).padStart(2,'0')+'/'+String(d.getUTCMonth()+1).padStart(2,'0')+'/'+d.getUTCFullYear();}
+function kg(n){return n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:3})+' kg';}
+
+function statusFor(days){
+  if(days==null) return {t:'Sem validade',c:'warn'};
+  return days<0?{t:'Vencida · bloquear',c:'bad'}:days<=14?{t:'Vence em '+days+' dias',c:'warn'}:{t:'OK · '+days+' dias',c:'ok'};
+}
+function interpretTemplate(raw, others){
+  const s=(raw||'').trim().replace(/^\][A-Za-z]\d/,'');
+  for(const t of TEMPLATES){
+    const m=s.match(t.re); if(!m) continue;
+    const r=t.read(m);
+    // Segundo código da etiqueta (ITF) = número da caixa, sem o 1º dígito e o dígito verificador
+    const itf=(others||[]).map(x=>String(x).trim()).find(x=>x!==s&&/^\d{10}$/.test(x));
+    const serial=itf?itf.slice(1,-1):null;
+    return {raw:s, ai:{}, gtin:null, code:r.code, product:t.products[r.code]||('Produto '+r.code), supplier:t.supplier+' · código próprio', known:!!t.products[r.code],
+      weight:r.weight, unit:'kg', wKey:null, packed:null, useBy:null, useBySrc:'', lot:null, lotSrc:'', serial, days:null, status:statusFor(null), template:true, note:t.note};
+  }
+  return null;
+}
+function interpret(raw, others){
+  const ai=parseElements(raw);
+  if(!ai['01']) return interpretTemplate(raw, others);
+  const gtin=ai['01'];
+  const prof=PROFILES.find(x=>gtin.slice(1).startsWith(x.prefix))||null;
+  const p=prof?{name:PRODUCTS[gtin]||'Produto a cadastrar', supplier:prof.supplier, shelf:prof.shelf, lotRule:prof.lot}:null;
+  let wKey=Object.keys(ai).find(k=>/^310\d$/.test(k)), weight=null, unit='kg';
+  if(wKey) weight=+ai[wKey]/Math.pow(10,+wKey[3]);
+  else{const lb=Object.keys(ai).find(k=>/^320\d$/.test(k)); if(lb){wKey=lb;weight=(+ai[lb]/Math.pow(10,+lb[3]))*0.45359237;unit='lb→kg';}}
+  const packed=ai['13']?ymd(ai['13']):null, prod=ai['11']?ymd(ai['11']):null;
+  let useBy=ai['17']?ymd(ai['17']):(ai['15']?ymd(ai['15']):null), useBySrc=ai['17']?'(17)':(ai['15']?'(15)':'');
+  const base=packed||prod;
+  if(!useBy && p && p.shelf && base){useBy=base+p.shelf*864e5;useBySrc='regra: '+p.shelf+' dias';}
+  let lot=ai['10']||null, lotSrc=ai['10']?'(10)':'';
+  if(!lot && p && p.lotRule && base){
+    const d=new Date(base);const doy=String(Math.round((base-Date.UTC(d.getUTCFullYear(),0,0))/864e5)).padStart(3,'0');
+    if(p.lotRule.rule==='yyddd'){lot=String(d.getUTCFullYear()).slice(2)+doy;lotSrc='regra: ano + dia do ano';}
+    if(p.lotRule.rule==='ddd'){lot=(p.lotRule.pre||'')+doy;lotSrc='regra: '+(p.lotRule.pre||'')+' + dia do ano';}
+  }
+  const days=useBy!=null?Math.round((useBy-TODAY)/864e5):null;
+  const status=statusFor(days);
+  let note='';
+  if(prof&&prof.kg&&weight!=null&&(weight<prof.kg[0]||weight>prof.kg[1])) note='Peso fora da faixa normal deste fornecedor ('+prof.kg[0]+'–'+prof.kg[1]+' kg). Confira a etiqueta.';
+  return {raw, ai, gtin, product:p?p.name:'Produto não cadastrado', supplier:p?p.supplier:'GTIN '+gtin+' · fornecedor sem perfil', known:!!(p&&PRODUCTS[gtin]),
+    weight, unit, wKey, packed, useBy, useBySrc, lot, lotSrc, serial:ai['21']||null, days, status, note};
+}
+
+// ---------- decoding images ----------
+let zx=null;
+function zxReader(){
+  if(zx) return zx; if(!window.ZXing) return null;
+  const Z=window.ZXing, hints=new Map();
+  hints.set(Z.DecodeHintType.POSSIBLE_FORMATS,[Z.BarcodeFormat.CODE_128,Z.BarcodeFormat.DATA_MATRIX,Z.BarcodeFormat.QR_CODE,Z.BarcodeFormat.EAN_13,Z.BarcodeFormat.ITF]);
+  hints.set(Z.DecodeHintType.TRY_HARDER,true);
+  hints.set(Z.DecodeHintType.ASSUME_GS1,true);
+  const r=new Z.MultiFormatReader(); r.setHints(hints); zx={Z,r}; return zx;
+}
+function canvasFrom(img,maxDim,rot){
+  const s=Math.min(1,maxDim/Math.max(img.width,img.height));
+  let w=Math.round(img.width*s), h=Math.round(img.height*s);
+  const c=document.createElement('canvas');
+  if(rot){c.width=h;c.height=w;}else{c.width=w;c.height=h;}
+  const x=c.getContext('2d',{willReadFrequently:true});
+  if(rot){x.translate(h,0);x.rotate(Math.PI/2);}
+  x.drawImage(img,0,0,w,h); return c;
+}
+function zxDecode(canvas){
+  const k=zxReader(); if(!k) return null;
+  try{
+    const src=new k.Z.HTMLCanvasElementLuminanceSource(canvas);
+    const bmp=new k.Z.BinaryBitmap(new k.Z.HybridBinarizer(src));
+    const res=k.r.decode(bmp); return res.getText();
+  }catch(e){return null;}
+}
+async function decodeImage(img){
+  const found=[];
+  if('BarcodeDetector' in window){
+    try{
+      const det=new BarcodeDetector({formats:['code_128','data_matrix','qr_code','ean_13','itf']});
+      const codes=await det.detect(img);
+      codes.forEach(c=>found.push(c.rawValue));
+    }catch(e){}
+  }
+  const pick=()=>{
+    const all=[...new Set(found)];
+    const gs1=all.map(c=>parseElements(c)['01']?interpret(c,all):null).find(Boolean);
+    if(gs1) return gs1;
+    return all.map(c=>interpret(c,all)).find(Boolean)||null;
+  };
+  let best=pick();
+  if(best&&!best.template) return best;
+  // Leitura por partes: cada metade da foto pode conter um código diferente (ex.: Liffey tem dois)
+  const tries=[[1800,false,null],[1200,false,null],[2400,false,null],[1800,true,null],[1800,false,'top'],[1800,false,'bottom'],[1800,false,'left'],[1800,false,'right'],[900,false,null]];
+  for(const [d,rot,part] of tries){
+    await new Promise(r=>setTimeout(r,0));
+    const txt=zxDecode(part?cropCanvas(canvasFrom(img,d,rot),part):canvasFrom(img,d,rot));
+    if(txt&&!found.includes(txt)) found.push(txt);
+    best=pick();
+    if(best&&!best.template) return best;
+    if(best&&best.template&&best.serial) return best;
+  }
+  return best||(found.length?{unparsed:found[0]}:null);
+}
+function cropCanvas(c,part){
+  const w=c.width,h=c.height,o=document.createElement('canvas');
+  const r={top:[0,0,w,h*0.6],bottom:[0,h*0.4,w,h*0.6],left:[0,0,w*0.6,h],right:[w*0.4,0,w*0.6,h]}[part];
+  o.width=Math.round(r[2]);o.height=Math.round(r[3]);
+  o.getContext('2d',{willReadFrequently:true}).drawImage(c,r[0],r[1],r[2],r[3],0,0,o.width,o.height);
+  return o;
+}
+
+// ---------- UI ----------
+const $=id=>document.getElementById(id);
+const statusEl=$('status');
+function setStatus(text,cls){statusEl.hidden=!text;statusEl.textContent=text||'';statusEl.className='state '+(cls||'info');}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+let session=[];
+try{session=JSON.parse(localStorage.getItem('scan-session')||'[]');}catch(e){session=[];}
+function save(){try{localStorage.setItem('scan-session',JSON.stringify(session));}catch(e){}}
+
+function showResult(it,example){
+  const pill=$('resPill'), box=$('result');
+  if(!it){pill.className='pill bad';pill.textContent='Não lido';box.innerHTML='<p class="empty">Não encontrei um código GS1 nessa imagem. Tente outra foto: mais perto, sem reflexo e com o código inteiro no quadro.</p>';return;}
+  if(it.unparsed){pill.className='pill warn';pill.textContent='Código sem GS1';box.innerHTML='<p class="empty">Li um código, mas ele não segue o padrão GS1 (sem produto e peso). Conteúdo lido:</p><p class="raw">'+esc(it.unparsed)+'</p>';return;}
+  pill.className='pill '+it.status.c; pill.textContent=it.status.t;
+  current=it;
+  const rows=[
+    it.template?['','Código do produto',it.code]:['01','GTIN do produto',it.gtin],
+    [it.wKey||'310x','Peso líquido',it.weight!=null?kg(it.weight)+(it.unit!=='kg'?' (convertido de lb)':''):'—'],
+    [it.ai['13']?'13':(it.ai['11']?'11':''),it.ai['13']?'Embalado em':'Produzido em',it.packed||it.ai['11']?fmtD(it.packed||ymd(it.ai['11'])):'—'],
+    [it.useBySrc.startsWith('(')?it.useBySrc.slice(1,3):'','Validade'+(it.useBySrc&&!it.useBySrc.startsWith('(')?' ('+it.useBySrc+')':''),it.useBy?fmtD(it.useBy):'—'],
+    [it.lotSrc==='(10)'?'10':'','Lote'+(it.lotSrc&&it.lotSrc!=='(10)'?' ('+it.lotSrc+')':''),it.lot||'—'],
+    [it.template?'':'21','Serial da caixa',it.serial||'—']
+  ];
+  const manual=!it.useBy?'<div class="manual" style="flex-direction:column;gap:6px"><label for="useByIn" style="font-size:14px;font-weight:600">Validade impressa na etiqueta</label><input id="useByIn" type="date" style="font-family:var(--sans)"></div>':'';
+  box.innerHTML=
+    '<div class="prod">'+esc(it.product)+'</div><p class="sub">'+esc(it.supplier)+(example?' · exemplo':'')+'</p>'+
+    '<div class="kgbig">'+(it.weight!=null?kg(it.weight):'—')+'</div>'+
+    '<dl>'+rows.map(r=>'<div class="row"><dt>'+(r[0]?'<span class="ai">('+esc(r[0])+')</span>':'')+esc(r[1])+'</dt><dd>'+esc(r[2])+'</dd></div>').join('')+'</dl>'+
+    (it.days!=null&&it.days<0?'<div class="state bad">Validade vencida: esta caixa deve entrar bloqueada para venda.</div>':'')+
+    (it.note?'<div class="state warn">'+esc(it.note)+'</div>':'')+manual+
+    (!it.known?'<div class="state warn">Produto ainda não cadastrado. No sistema, aqui você vincularia o produto e as regras do fornecedor.</div>':'')+
+    '<p class="raw">Lido: '+esc(it.raw)+'</p>';
+  const ui=$('useByIn');
+  if(ui) ui.addEventListener('change',()=>{
+    if(!ui.value) return;
+    const [y,m,d]=ui.value.split('-').map(Number);
+    current.useBy=Date.UTC(y,m-1,d); current.useBySrc='digitada';
+    current.days=Math.round((current.useBy-TODAY)/864e5); current.status=statusFor(current.days);
+    const s=session.find(x=>x.raw===current.raw);
+    if(s){s.useBy=fmtD(current.useBy);s.status=current.status;save();renderList();}
+    showResult(current);
+    setStatus('Validade registrada.','ok');
+  });
+  box.classList.remove('flash'); void box.offsetWidth; box.classList.add('flash');
+}
+let current=null;
+function addToSession(it){
+  if(!it||it.unparsed) return 'none';
+  if(it.serial && session.some(s=>s.serial===it.serial)) return 'dup';
+  session.unshift({raw:it.raw,product:it.product,weight:it.weight,lot:it.lot,useBy:it.useBy?fmtD(it.useBy):'',serial:it.serial,status:it.status});
+  save(); renderList(); return 'added';
+}
+function renderList(){
+  const L=$('list');
+  $('count').textContent=session.length+(session.length===1?' caixa':' caixas');
+  if(!session.length){L.innerHTML='<p class="empty">Nenhuma caixa ainda. Cada leitura válida entra aqui; o mesmo serial não entra duas vezes.</p>';$('tot').hidden=true;return;}
+  L.innerHTML=session.map(s=>'<div class="item"><div><strong>'+esc(s.product)+'</strong> <span class="pill '+s.status.c+'">'+esc(s.status.t)+'</span></div><div class="w">'+(s.weight!=null?kg(s.weight):'—')+'</div><div class="m">Lote '+esc(s.lot||'—')+' · val. '+esc(s.useBy||'—')+'</div><div class="m">'+esc(s.serial||'')+'</div></div>').join('');
+  const t=session.reduce((a,s)=>a+(s.weight||0),0);
+  $('tot').hidden=false; $('totKg').textContent=kg(t);
+}
+function handleText(txt,example){
+  const it=interpret(txt);
+  if(!it){showResult(null);setStatus('Esse texto não tem o código de produto (01). Confira se copiou o código completo.','bad');return;}
+  showResult(it,example);
+  const r=addToSession(it);
+  setStatus(r==='dup'?'Esta caixa (mesmo serial) já foi lida nesta sessão.':'Caixa adicionada à sessão.',r==='dup'?'warn':'ok');
+}
+async function handleFile(file){
+  if(!file) return;
+  const url=URL.createObjectURL(file);
+  $('prev').src=url; $('prevWrap').hidden=false;
+  setStatus('Lendo o código de barras…','info');
+  let img;
+  try{ img=await createImageBitmap(file,{imageOrientation:'from-image'}); }
+  catch(e){ img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url;}).catch(()=>null); }
+  if(!img){setStatus('Não consegui abrir essa imagem. Envie uma foto em JPG ou PNG.','bad');return;}
+  const it=await decodeImage(img);
+  showResult(it);
+  if(it&&!it.unparsed){const r=addToSession(it);setStatus(r==='dup'?'Esta caixa (mesmo serial) já foi lida nesta sessão.':'Caixa adicionada à sessão.',r==='dup'?'warn':'ok');}
+  else setStatus(it?'Código lido, mas fora do padrão GS1.':'Nenhum código encontrado na foto.', it?'warn':'bad');
+}
+$('cam').addEventListener('change',e=>{handleFile(e.target.files[0]);e.target.value='';});
+$('up').addEventListener('change',e=>{handleFile(e.target.files[0]);e.target.value='';});
+$('mform').addEventListener('submit',e=>{e.preventDefault();const v=$('manual').value.trim();if(v)handleText(v);});
+$('exBtn').addEventListener('click',()=>{$('manual').value=EXAMPLE;handleText(EXAMPLE,true);});
+$('clearBtn').addEventListener('click',()=>{session=[];save();renderList();setStatus('Sessão limpa.','info');});
+$('copyBtn').addEventListener('click',()=>{
+  const csv=['produto;peso_kg;lote;validade;serial;status'].concat(session.map(s=>[s.product,s.weight!=null?s.weight.toFixed(3).replace('.',','):'',s.lot||'',s.useBy||'',s.serial||'',s.status.t].join(';'))).join('\n');
+  const msg=$('copyMsg');
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(csv).then(()=>{msg.textContent='Lista copiada. Cole numa planilha.';},()=>{msg.textContent='Não consegui copiar automaticamente neste app.';});}
+  else msg.textContent='Cópia não disponível neste app.';
+});
+renderList();
+// Open in a working state: show the example decoded without adding it to the session.
+const ex=interpret(EXAMPLE); showResult(ex,true); $('resPill').textContent=ex.status.t+' · exemplo';
+})();
+</script>
+
+</body>
+</html>

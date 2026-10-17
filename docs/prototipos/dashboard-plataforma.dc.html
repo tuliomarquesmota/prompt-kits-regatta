@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Plataforma — protótipo</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F4F3F1;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#1C1E21}
+a{color:#8E2A35}a:hover{color:#6E1F28}
+*{box-sizing:border-box}
+.nav{display:block;width:100%;text-align:left;background:transparent;border:0;color:#C9CDD2;font:inherit;font-size:14px;padding:10px 12px;border-radius:6px;cursor:pointer;min-height:40px}
+.nav:hover{background:#24272B;color:#FFFFFF}
+.nav.on{background:#8E2A35;color:#FFFFFF;font-weight:600}
+.navh{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#8A9098;padding:18px 12px 6px}
+.card{background:#FFFFFF;border:1px solid #E3E1DD;border-radius:10px;padding:20px}
+.h2{margin:0 0 4px;font-size:22px;font-weight:600}
+.sub{margin:0;color:#5D636B;font-size:14px}
+.lbl{font-size:12px;color:#5D636B;text-transform:uppercase;letter-spacing:.06em}
+.big{font-size:26px;font-weight:600;margin-top:6px;font-family:'IBM Plex Mono',monospace}
+.num{font-family:'IBM Plex Mono',monospace;font-size:13px}
+.tbl{overflow-x:auto}
+.tr{display:grid;gap:12px;padding:11px 4px;border-bottom:1px solid #EEECE8;font-size:14px;align-items:center;min-width:720px}
+.th{font-size:12px;color:#5D636B;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #D9D6D1}
+.pill{display:inline-block;font-size:12px;font-weight:500;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.ok{background:#E2EFE7;color:#245740}
+.warn{background:#FBEFD9;color:#7A4700}
+.bad{background:#F8E3E4;color:#8C1F27}
+.info{background:#E4EAF4;color:#24406E}
+.tab{background:#FFFFFF;border:1px solid #D9D6D1;font:inherit;font-size:14px;padding:8px 16px;border-radius:999px;cursor:pointer;color:#1C1E21;min-height:40px}
+.tab.on{background:#1C1E21;color:#FFFFFF;border-color:#1C1E21}
+.btn{background:#8E2A35;color:#FFFFFF;border:0;font:inherit;font-size:14px;font-weight:600;padding:10px 18px;border-radius:8px;cursor:pointer;min-height:44px}
+.btn:hover{background:#6E1F28}
+.btn2{background:#FFFFFF;color:#1C1E21;border:1px solid #D9D6D1;font:inherit;font-size:14px;padding:10px 16px;border-radius:8px;cursor:pointer;min-height:44px}
+.line{display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px solid #EEECE8;font-size:14px}
+.line.tot{font-weight:600;border-bottom:2px solid #1C1E21}
+.prod{text-align:left;background:#FFFFFF;border:1px solid #E3E1DD;border-radius:10px;padding:14px;cursor:pointer;font:inherit;color:#1C1E21}
+.prod.on{border:2px solid #8E2A35;padding:13px}
+</style>
+</helmet>
+
+<div style="display: flex; flex-wrap: wrap; min-height: 100vh; align-items: stretch;">
+
+  <nav aria-label="Menu principal" style="flex: 1 1 220px; max-width: 100%; background: #17191C; padding: 20px 12px; display: flex; flex-direction: column;">
+    <div style="display: flex; align-items: center; gap: 10px; padding: 4px 12px 8px;">
+      <div style="width: 30px; height: 30px; border-radius: 7px; background: #8E2A35; display: flex; align-items: center; justify-content: center;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7l9-4 9 4-9 4-9-4z"></path><path d="M3 12l9 4 9-4"></path><path d="M3 17l9 4 9-4"></path></svg>
+      </div>
+      <div style="color: #FFFFFF; font-weight: 700; font-size: 18px; letter-spacing: .02em;">LOTE</div>
+    </div>
+    <div class="navh">Visão geral</div>
+    <sc-for list="{{navA}}" as="item" hint-placeholder-count="1">
+      <button class="nav {{item.cls}}" onClick="{{item.pick}}">{{item.label}}</button>
+    </sc-for>
+    <div class="navh">Operação</div>
+    <sc-for list="{{navB}}" as="item" hint-placeholder-count="5">
+      <button class="nav {{item.cls}}" onClick="{{item.pick}}">{{item.label}}</button>
+    </sc-for>
+    <div class="navh">Finanças</div>
+    <sc-for list="{{navC}}" as="item" hint-placeholder-count="3">
+      <button class="nav {{item.cls}}" onClick="{{item.pick}}">{{item.label}}</button>
+    </sc-for>
+  </nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column;">
+
+    <header style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 14px 28px; background: #FFFFFF; border-bottom: 1px solid #E3E1DD;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span class="lbl" style="text-transform: none; letter-spacing: 0;">Empresa</span>
+        <div style="font-weight: 600; font-size: 15px; border: 1px solid #D9D6D1; border-radius: 8px; padding: 8px 12px;">SA Global Meat Ltd ▾</div>
+        <span class="pill info">Dados de exemplo</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <label style="display: flex; align-items: center; gap: 8px; border: 1px solid #D9D6D1; border-radius: 8px; padding: 0 12px; min-height: 40px; color: #5D636B; font-size: 14px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+          <span>Buscar produto, lote, cliente…</span>
+        </label>
+        <div aria-label="Usuário" style="width: 36px; height: 36px; border-radius: 50%; background: #1C1E21; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600;">AD</div>
+      </div>
+    </header>
+
+    <div style="padding: 28px; display: flex; flex-direction: column; gap: 20px; max-width: 1280px; width: 100%;">
+
+      <!-- PAINEL -->
+      <sc-if value="{{isPainel}}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <div>
+            <h1 class="h2">Painel</h1>
+            <p class="sub">Outubro 2026 · visão geral da operação e das finanças</p>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
+            <div class="card"><div class="lbl">Vendas no mês</div><div class="big">£412.600</div><div class="sub" style="margin-top: 4px;">+8,4% vs setembro</div></div>
+            <div class="card"><div class="lbl">Margem bruta</div><div class="big">22,9%</div><div class="sub" style="margin-top: 4px;">landed cost incluído</div></div>
+            <div class="card"><div class="lbl">Stock em câmara</div><div class="big">18.430 kg</div><div class="sub" style="margin-top: 4px;">842 caixas · £212.380 a custo</div></div>
+            <div class="card"><div class="lbl">A receber</div><div class="big">£126.450</div><div class="sub" style="margin-top: 4px; color: #8C1F27;">£18.900 vencido</div></div>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+            <div class="card" style="flex: 3 1 420px; min-width: 0;">
+              <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px;">
+                <div><div style="font-weight: 600; font-size: 16px;">Cash flow previsto</div><div class="sub">Saldo projetado em caixa, próximas 8 semanas (£ mil)</div></div>
+                <span class="pill ok">Sem semanas negativas</span>
+              </div>
+              <div style="display: flex; align-items: flex-end; gap: 12px; height: 180px; margin-top: 20px; border-bottom: 1px solid #D9D6D1; padding: 0 4px;">
+                <sc-for list="{{cash}}" as="c" hint-placeholder-count="8">
+                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; height: 100%;">
+                    <span class="num" style="font-size: 12px; color: #5D636B;">{{c.v}}</span>
+                    <div style="{{c.bar}}"></div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display: flex; gap: 12px; padding: 6px 4px 0;">
+                <sc-for list="{{cash}}" as="c" hint-placeholder-count="8">
+                  <span style="flex: 1; text-align: center; font-size: 12px; color: #5D636B;">{{c.w}}</span>
+                </sc-for>
+              </div>
+            </div>
+            <div class="card" style="flex: 2 1 300px; min-width: 0;">
+              <div style="font-weight: 600; font-size: 16px; margin-bottom: 8px;">Precisa de atenção</div>
+              <sc-for list="{{alerts}}" as="a" hint-placeholder-count="4">
+                <div style="display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid #EEECE8;">
+                  <span class="pill {{a.tone}}">{{a.tag}}</span>
+                  <div style="font-size: 14px; line-height: 1.45;">{{a.text}}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- RECEBIMENTO -->
+      <sc-if value="{{isReceb}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <div>
+            <h1 class="h2">Recebimento por scan</h1>
+            <p class="sub">Leia o código GS1-128 da etiqueta do frigorífico. Peso, data e serial vêm do código; validade e lote vêm das regras do fornecedor.</p>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+            <div class="card" style="flex: 1 1 380px; min-width: 0; display: flex; flex-direction: column; gap: 14px;">
+              <label for="scan" style="font-weight: 600; font-size: 15px;">Código lido (câmera ou leitor)</label>
+              <input id="scan" value="{{scanInput}}" onChange="{{onScanInput}}" style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; padding: 12px; border: 1px solid #B9B5AF; border-radius: 8px; width: 100%; min-height: 44px;">
+              <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <button class="btn" onClick="{{doScan}}">Ler código</button>
+                <button class="btn2" onClick="{{ex1}}">Exemplo: caixa Teys (AU)</button>
+                <button class="btn2" onClick="{{ex2}}">Exemplo: caixa BR</button>
+              </div>
+              <div style="display: flex; align-items: center; justify-content: center; gap: 10px; border: 2px dashed #D9D6D1; border-radius: 10px; min-height: 120px; color: #5D636B; font-size: 14px;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 7V4h3M21 7V4h-3M3 17v3h3M21 17v3h-3"></path><path d="M7 8v8M10 8v8M13 8v8M16 8v8"></path></svg>
+                <span>No celular, aqui abre a câmera</span>
+              </div>
+            </div>
+            <div class="card" style="flex: 1 1 380px; min-width: 0;">
+              <div style="font-weight: 600; font-size: 15px; margin-bottom: 8px;">Resultado da leitura</div>
+              <sc-if value="{{hasScan}}" hint-placeholder-val="{{ false }}">
+                <div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-bottom: 10px;">
+                    <div style="font-size: 18px; font-weight: 600;">{{scan.product}}</div>
+                    <span class="pill {{scan.tone}}">{{scan.status}}</span>
+                  </div>
+                  <sc-for list="{{scan.fields}}" as="f" hint-placeholder-count="6">
+                    <div class="line">
+                      <span style="color: #5D636B;">{{f.k}}</span>
+                      <span class="num" style="text-align: right;">{{f.v}}</span>
+                    </div>
+                  </sc-for>
+                  <sc-if value="{{scan.expired}}" hint-placeholder-val="{{ false }}">
+                    <div class="bad" style="margin-top: 14px; padding: 12px; border-radius: 8px; font-size: 14px;">Validade vencida: a caixa entra bloqueada e não pode ser vendida.</div>
+                  </sc-if>
+                </div>
+              </sc-if>
+              <sc-if value="{{noScan}}" hint-placeholder-val="{{ true }}">
+                <p class="sub">Escolha um exemplo e toque em “Ler código”.</p>
+              </sc-if>
+            </div>
+          </div>
+          <div class="card">
+            <div style="font-weight: 600; font-size: 15px; margin-bottom: 6px;">Caixas recebidas nesta sessão ({{recCount}})</div>
+            <div class="tbl">
+              <div class="tr th" style="grid-template-columns: 2fr 1fr 1fr 1.2fr 1.6fr 1fr;"><span>Produto</span><span>Peso</span><span>Lote</span><span>Validade</span><span>Serial</span><span>Status</span></div>
+              <sc-for list="{{received}}" as="r" hint-placeholder-count="2">
+                <div class="tr" style="grid-template-columns: 2fr 1fr 1fr 1.2fr 1.6fr 1fr;"><span>{{r.product}}</span><span class="num">{{r.kg}}</span><span class="num">{{r.lot}}</span><span class="num">{{r.useBy}}</span><span class="num">{{r.serial}}</span><span><span class="pill {{r.tone}}">{{r.status}}</span></span></div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- STOCK -->
+      <sc-if value="{{isStock}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <div>
+            <h1 class="h2">Stock por caixa</h1>
+            <p class="sub">Cada caixa tem peso, lote e validade próprios. A ordem de saída segue FEFO: vence primeiro, sai primeiro.</p>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px;">
+            <sc-for list="{{products}}" as="p" hint-placeholder-count="5">
+              <button class="prod {{p.cls}}" onClick="{{p.pick}}">
+                <div style="font-weight: 600; font-size: 15px;">{{p.name}}</div>
+                <div class="sub" style="font-size: 13px;">{{p.origin}}</div>
+                <div class="num" style="margin-top: 10px; font-size: 15px;">{{p.totKg}}</div>
+                <div class="sub" style="font-size: 13px;">{{p.count}} caixas · vence {{p.next}}</div>
+              </button>
+            </sc-for>
+          </div>
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; align-items: baseline; margin-bottom: 6px;">
+              <div style="font-weight: 600; font-size: 16px;">{{sel.name}}: caixas em câmara</div>
+              <div class="sub">Custo médio {{sel.cost}}/kg · valor {{sel.value}}</div>
+            </div>
+            <div class="tbl">
+              <div class="tr th" style="grid-template-columns: 1.4fr 1fr 1fr 1.2fr 1fr 1fr 1.4fr;"><span>Serial</span><span>Peso</span><span>Lote</span><span>Validade</span><span>Dias</span><span>Local</span><span>Status</span></div>
+              <sc-for list="{{sel.boxes}}" as="b" hint-placeholder-count="5">
+                <div class="tr" style="grid-template-columns: 1.4fr 1fr 1fr 1.2fr 1fr 1fr 1.4fr;"><span class="num">{{b.serial}}</span><span class="num">{{b.kg}}</span><span class="num">{{b.lot}}</span><span class="num">{{b.useBy}}</span><span class="num">{{b.days}}</span><span class="num">{{b.loc}}</span><span><span class="pill {{b.tone}}">{{b.status}}</span></span></div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- COMPRAS -->
+      <sc-if value="{{isCompras}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; align-items: flex-end;">
+            <div><h1 class="h2">Compras</h1><p class="sub">Purchase orders dos frigoríficos e bills a pagar</p></div>
+            <div style="display: flex; gap: 8px;">
+              <button class="tab {{tabPO}}" onClick="{{setPO}}">Purchase orders</button>
+              <button class="tab {{tabBills}}" onClick="{{setBills}}">Bills</button>
+            </div>
+          </div>
+          <sc-if value="{{showPO}}" hint-placeholder-val="{{ true }}">
+            <div class="card tbl">
+              <div class="tr th" style="grid-template-columns: 1fr 2fr 1fr 1fr 1.2fr 1.2fr;"><span>PO</span><span>Fornecedor</span><span>Caixas</span><span>Kg est.</span><span>Chegada</span><span>Status</span></div>
+              <sc-for list="{{pos}}" as="o" hint-placeholder-count="4">
+                <div class="tr" style="grid-template-columns: 1fr 2fr 1fr 1fr 1.2fr 1.2fr;"><span class="num">{{o.id}}</span><span>{{o.sup}}</span><span class="num">{{o.boxes}}</span><span class="num">{{o.kg}}</span><span class="num">{{o.eta}}</span><span><span class="pill {{o.tone}}">{{o.status}}</span></span></div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{showBills}}" hint-placeholder-val="{{ false }}">
+            <div class="card tbl">
+              <div class="tr th" style="grid-template-columns: 1.2fr 2fr 1.6fr 1fr 1.2fr 1fr;"><span>Bill</span><span>Fornecedor</span><span>Tipo</span><span>Vence</span><span>Valor</span><span>Status</span></div>
+              <sc-for list="{{bills}}" as="o" hint-placeholder-count="5">
+                <div class="tr" style="grid-template-columns: 1.2fr 2fr 1.6fr 1fr 1.2fr 1fr;"><span class="num">{{o.id}}</span><span>{{o.sup}}</span><span>{{o.type}}</span><span class="num">{{o.due}}</span><span class="num">{{o.amt}}</span><span><span class="pill {{o.tone}}">{{o.status}}</span></span></div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <!-- VENDAS -->
+      <sc-if value="{{isVendas}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; align-items: flex-end;">
+            <div><h1 class="h2">Vendas</h1><p class="sub">Pedidos dos clientes B2B e cadastro com tabela de preço</p></div>
+            <div style="display: flex; gap: 8px;">
+              <button class="tab {{tabSO}}" onClick="{{setSO}}">Sales orders</button>
+              <button class="tab {{tabCli}}" onClick="{{setCli}}">Clientes</button>
+            </div>
+          </div>
+          <sc-if value="{{showSO}}" hint-placeholder-val="{{ true }}">
+            <div class="card tbl">
+              <div class="tr th" style="grid-template-columns: 1fr 2fr 2fr 1fr 1fr 1.3fr;"><span>Pedido</span><span>Cliente</span><span>Itens</span><span>Kg</span><span>Total</span><span>Status</span></div>
+              <sc-for list="{{sos}}" as="o" hint-placeholder-count="5">
+                <div class="tr" style="grid-template-columns: 1fr 2fr 2fr 1fr 1fr 1.3fr;"><span class="num">{{o.id}}</span><span>{{o.cli}}</span><span>{{o.items}}</span><span class="num">{{o.kg}}</span><span class="num">{{o.tot}}</span><span><span class="pill {{o.tone}}">{{o.status}}</span></span></div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{showCli}}" hint-placeholder-val="{{ false }}">
+            <div class="card tbl">
+              <div class="tr th" style="grid-template-columns: 2fr 1.2fr 1.4fr 1fr 1fr 1fr;"><span>Cliente</span><span>Tipo</span><span>Tabela de preço</span><span>Prazo</span><span>Saldo</span><span>Limite</span></div>
+              <sc-for list="{{clients}}" as="o" hint-placeholder-count="5">
+                <div class="tr" style="grid-template-columns: 2fr 1.2fr 1.4fr 1fr 1fr 1fr;"><span>{{o.name}}</span><span>{{o.type}}</span><span>{{o.table}}</span><span class="num">{{o.terms}}</span><span class="num">{{o.bal}}</span><span class="num">{{o.lim}}</span></div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <!-- INVOICES -->
+      <sc-if value="{{isInv}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <div><h1 class="h2">Invoices</h1><p class="sub">Cobradas pelo peso real de cada caixa, não por peso estimado</p></div>
+          <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+            <div class="card tbl" style="flex: 3 1 480px; min-width: 0;">
+              <div class="tr th" style="grid-template-columns: 1.1fr 2fr 1fr 1fr 1.1fr 1fr; min-width: 600px;"><span>Invoice</span><span>Cliente</span><span>Emitida</span><span>Vence</span><span>Valor</span><span>Status</span></div>
+              <sc-for list="{{invs}}" as="o" hint-placeholder-count="6">
+                <div class="tr" style="grid-template-columns: 1.1fr 2fr 1fr 1fr 1.1fr 1fr; min-width: 600px;"><span class="num">{{o.id}}</span><span>{{o.cli}}</span><span class="num">{{o.iss}}</span><span class="num">{{o.due}}</span><span class="num">{{o.amt}}</span><span><span class="pill {{o.tone}}">{{o.status}}</span></span></div>
+              </sc-for>
+            </div>
+            <div class="card" style="flex: 2 1 320px; min-width: 0;">
+              <div class="lbl">Prévia</div>
+              <div style="font-size: 18px; font-weight: 600; margin: 4px 0 2px;">INV-5531 · The Butcher's Block</div>
+              <div class="sub" style="margin-bottom: 12px;">Itens por caixa, com lote para rastreabilidade</div>
+              <sc-for list="{{invLines}}" as="l" hint-placeholder-count="3">
+                <div class="line" style="flex-direction: column; gap: 2px;">
+                  <div style="display: flex; justify-content: space-between; gap: 12px;"><span style="font-weight: 500;">{{l.item}}</span><span class="num">{{l.total}}</span></div>
+                  <span class="num" style="color: #5D636B; font-size: 12px;">{{l.detail}}</span>
+                </div>
+              </sc-for>
+              <div class="line"><span>VAT (carne fresca: zero-rated)</span><span class="num">£0,00</span></div>
+              <div class="line tot"><span>Total</span><span class="num">£2.317,03</span></div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- CONTABILIDADE -->
+      <sc-if value="{{isContab}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; align-items: flex-end;">
+            <div><h1 class="h2">Contabilidade</h1><p class="sub">Gerada automaticamente das compras, vendas e movimentos de stock</p></div>
+            <div style="display: flex; gap: 8px;">
+              <button class="tab {{tabDRE}}" onClick="{{setDRE}}">DRE · P&amp;L</button>
+              <button class="tab {{tabBal}}" onClick="{{setBal}}">Balanço</button>
+            </div>
+          </div>
+          <sc-if value="{{showDRE}}" hint-placeholder-val="{{ true }}">
+            <div class="card" style="max-width: 720px;">
+              <div style="font-weight: 600; font-size: 16px; margin-bottom: 8px;">Demonstração de resultado · setembro 2026</div>
+              <sc-for list="{{dre}}" as="l" hint-placeholder-count="10">
+                <div class="line {{l.cls}}"><span style="{{l.ind}}">{{l.k}}</span><span class="num">{{l.v}}</span></div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{showBal}}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+              <div class="card" style="flex: 1 1 320px; min-width: 0;">
+                <div style="font-weight: 600; font-size: 16px; margin-bottom: 8px;">Ativo · 30/09/2026</div>
+                <sc-for list="{{balA}}" as="l" hint-placeholder-count="5">
+                  <div class="line {{l.cls}}"><span>{{l.k}}</span><span class="num">{{l.v}}</span></div>
+                </sc-for>
+              </div>
+              <div class="card" style="flex: 1 1 320px; min-width: 0;">
+                <div style="font-weight: 600; font-size: 16px; margin-bottom: 8px;">Passivo e patrimônio líquido</div>
+                <sc-for list="{{balP}}" as="l" hint-placeholder-count="7">
+                  <div class="line {{l.cls}}"><span>{{l.k}}</span><span class="num">{{l.v}}</span></div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <!-- VAT & BANCO -->
+      <sc-if value="{{isVat}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <div><h1 class="h2">VAT, HMRC e banco</h1><p class="sub">VAT return via Making Tax Digital e conciliação das transações bancárias</p></div>
+          <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+            <div class="card" style="flex: 1 1 340px; min-width: 0;">
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <div style="font-weight: 600; font-size: 16px;">VAT return · Q3 2026</div>
+                <span class="pill warn">Vence 07/11</span>
+              </div>
+              <sc-for list="{{vat}}" as="l" hint-placeholder-count="6">
+                <div class="line {{l.cls}}"><span>{{l.k}}</span><span class="num">{{l.v}}</span></div>
+              </sc-for>
+              <p class="sub" style="font-size: 13px; margin-top: 12px;">Carne fresca é zero-rated, por isso a empresa costuma ter VAT a recuperar. Regras a validar com o contador.</p>
+              <div style="display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap;">
+                <button class="btn">Enviar à HMRC (MTD)</button>
+                <button class="btn2">Ver detalhes</button>
+              </div>
+            </div>
+            <div class="card" style="flex: 2 1 460px; min-width: 0;">
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap;">
+                <div style="font-weight: 600; font-size: 16px;">Conciliação bancária</div>
+                <span class="pill ok">Banco conectado · sync às 06:00</span>
+              </div>
+              <div class="tbl">
+                <div class="tr th" style="grid-template-columns: 0.8fr 2fr 1fr 2fr 1fr; min-width: 640px;"><span>Data</span><span>Descrição no extrato</span><span>Valor</span><span>Sugestão</span><span>Status</span></div>
+                <sc-for list="{{bank}}" as="o" hint-placeholder-count="5">
+                  <div class="tr" style="grid-template-columns: 0.8fr 2fr 1fr 2fr 1fr; min-width: 640px;"><span class="num">{{o.d}}</span><span>{{o.desc}}</span><span class="num">{{o.amt}}</span><span>{{o.match}}</span><span><span class="pill {{o.tone}}">{{o.status}}</span></span></div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- PAYROLL -->
+      <sc-if value="{{isPay}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; align-items: flex-end;">
+            <div><h1 class="h2">Payroll</h1><p class="sub">Semanal ou mensal, com envio RTI à HMRC</p></div>
+            <div style="display: flex; gap: 8px;">
+              <button class="tab {{tabWk}}" onClick="{{setWk}}">Semanal</button>
+              <button class="tab {{tabMo}}" onClick="{{setMo}}">Mensal</button>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+            <div class="card"><div class="lbl">Período</div><div class="big" style="font-size: 20px;">{{payPeriod}}</div></div>
+            <div class="card"><div class="lbl">Bruto total</div><div class="big">{{payGross}}</div></div>
+            <div class="card"><div class="lbl">Líquido a pagar</div><div class="big">{{payNet}}</div></div>
+          </div>
+          <div class="card tbl">
+            <div class="tr th" style="grid-template-columns: 1.6fr 1.4fr 1fr 1fr 1fr 1fr 1fr;"><span>Funcionário</span><span>Função</span><span>Base</span><span>Bruto</span><span>PAYE</span><span>NI</span><span>Líquido</span></div>
+            <sc-for list="{{pay}}" as="o" hint-placeholder-count="5">
+              <div class="tr" style="grid-template-columns: 1.6fr 1.4fr 1fr 1fr 1fr 1fr 1fr;"><span>{{o.name}}</span><span>{{o.role}}</span><span class="num">{{o.base}}</span><span class="num">{{o.gross}}</span><span class="num">{{o.paye}}</span><span class="num">{{o.ni}}</span><span class="num">{{o.net}}</span></div>
+            </sc-for>
+            <div style="display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap;">
+              <button class="btn">Aprovar e enviar RTI</button>
+              <button class="btn2">Gerar payslips</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+  </main>
+</div>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+var TODAY = Date.UTC(2026, 9, 16);
+var EX1 = '(01)99332218350849(3102)002177(13)260226(21)050018580273';
+var EX2 = '(01)97891234500017(3103)018450(17)270310(10)L26283(21)88123401';
+var DICT = {
+  '99332218350849': { name: 'Oyster Blade · Teys (AU)', shelf: 140, lotRule: 'yyddd' },
+  '97891234500017': { name: 'Picanha · frigorífico BR (exemplo)', shelf: null, lotRule: 'ai10' }
+};
+function gbp(n) { return '£' + n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function gbp0(n) { return '£' + Math.round(n).toLocaleString('pt-BR'); }
+function kg(n) { return n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' kg'; }
+function ymd(s) { var y = 2000 + parseInt(s.slice(0, 2), 10), m = parseInt(s.slice(2, 4), 10), d = parseInt(s.slice(4, 6), 10); return Date.UTC(y, m - 1, d); }
+function fmtD(t) { var d = new Date(t); return ('0' + d.getUTCDate()).slice(-2) + '/' + ('0' + (d.getUTCMonth() + 1)).slice(-2) + '/' + d.getUTCFullYear(); }
+function daysLeft(t) { return Math.round((t - TODAY) / 864e5); }
+function status(days) {
+  if (days < 0) return { status: 'Vencida · bloqueada', tone: 'bad' };
+  if (days <= 14) return { status: 'Vence em ' + days + ' dias', tone: 'warn' };
+  return { status: 'OK', tone: 'ok' };
+}
+function parseGS1(s) {
+  var ai = {}, re = /\((\d{2,4})\)([^(]*)/g, m;
+  while ((m = re.exec(s || ''))) ai[m[1]] = m[2].trim();
+  if (!ai['01']) return null;
+  var gtin = ai['01'], p = DICT[gtin] || { name: 'Produto não cadastrado', shelf: null, lotRule: 'ai10' };
+  var wKey = Object.keys(ai).filter(function (k) { return /^31[0-9][0-9]$/.test(k) && k.slice(0, 3) === '310'; })[0];
+  var weight = wKey ? parseInt(ai[wKey], 10) / Math.pow(10, parseInt(wKey[3], 10)) : null;
+  var packed = ai['13'] ? ymd(ai['13']) : null;
+  var useBy = ai['17'] ? ymd(ai['17']) : (packed && p.shelf ? packed + p.shelf * 864e5 : null);
+  var lot = ai['10'] || null;
+  if (!lot && p.lotRule === 'yyddd' && packed) {
+    var d = new Date(packed), doy = Math.round((packed - Date.UTC(d.getUTCFullYear(), 0, 0)) / 864e5);
+    lot = String(d.getUTCFullYear()).slice(2) + ('00' + doy).slice(-3);
+  }
+  var days = useBy ? daysLeft(useBy) : null, st = days === null ? { status: 'Sem validade', tone: 'warn' } : status(days);
+  var fields = [
+    { k: '(01) GTIN do produto', v: gtin },
+    { k: '(' + (wKey || '310x') + ') Peso líquido', v: weight !== null ? kg(weight) : '—' },
+    { k: ai['13'] ? '(13) Embalado em' : 'Embalado em', v: packed ? fmtD(packed) : '—' },
+    { k: ai['17'] ? '(17) Validade' : 'Validade (regra: ' + p.shelf + ' dias)', v: useBy ? fmtD(useBy) : '—' },
+    { k: ai['10'] ? '(10) Lote' : 'Lote (regra: ano + dia do ano)', v: lot || '—' },
+    { k: '(21) Serial da caixa', v: ai['21'] || '—' }
+  ];
+  return { product: p.name, kg: weight !== null ? kg(weight) : '—', lot: lot || '—', useBy: useBy ? fmtD(useBy) : '—', serial: ai['21'] || '—', status: st.status, tone: st.tone, expired: days !== null && days < 0, fields: fields };
+}
+
+var PRODUCTS = [
+  { id: 'pic', name: 'Picanha', origin: 'Brasil · JBS', cost: 11.2, boxes: [[21.45, 'L26271', '2026-10-24', 'C1-A3'], [19.80, 'L26271', '2026-10-24', 'C1-A3'], [22.10, 'L26283', '2026-11-12', 'C1-A4'], [20.95, 'L26283', '2026-11-12', 'C1-A4'], [21.30, 'L26290', '2026-11-30', 'C1-B1']] },
+  { id: 'oys', name: 'Oyster Blade', origin: 'Austrália · Teys', cost: 9.4, boxes: [[21.77, '26057', '2026-07-16', 'C2-Q1'], [22.04, '26201', '2026-12-08', 'C2-A1'], [21.18, '26201', '2026-12-08', 'C2-A1'], [20.66, '26215', '2026-12-22', 'C2-A2']] },
+  { id: 'fra', name: 'Fraldinha', origin: 'Argentina · Swift', cost: 8.7, boxes: [[18.40, 'AR4410', '2026-10-28', 'C1-C2'], [18.95, 'AR4410', '2026-10-28', 'C1-C2'], [19.10, 'AR4452', '2026-11-20', 'C1-C3'], [18.72, 'AR4452', '2026-11-20', 'C1-C3']] },
+  { id: 'lam', name: 'Lamb Rack', origin: 'Nova Zelândia · Alliance', cost: 16.9, boxes: [[12.30, 'NZ8812', '2026-11-05', 'C3-A1'], [11.85, 'NZ8812', '2026-11-05', 'C3-A1'], [12.62, 'NZ8840', '2026-12-01', 'C3-A2']] },
+  { id: 'chk', name: 'Chicken Breast', origin: 'Reino Unido · Moy Park', cost: 5.1, boxes: [[10.00, 'UK2290', '2026-10-21', 'C4-A1'], [10.00, 'UK2290', '2026-10-21', 'C4-A1'], [10.00, 'UK2301', '2026-10-27', 'C4-A2']] }
+];
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { screen: 'painel', prod: 'pic', comprasTab: 'po', vendasTab: 'so', contabTab: 'dre', payFreq: 'wk', scanInput: EX1, scan: null, received: [] };
+  }
+  renderVals() {
+    var s = this.state, self = this, set = function (o) { return function () { self.setState(o); }; };
+    var mk = function (list) { return list.map(function (n) { return { label: n[1], cls: s.screen === n[0] ? 'on' : '', pick: set({ screen: n[0] }) }; }); };
+
+    var cashVals = [84, 96, 71, 58, 88, 102, 94, 115];
+    var cash = cashVals.map(function (v, i) { return { v: v, w: 'S' + (i + 1), bar: 'width: 100%; max-width: 44px; border-radius: 4px 4px 0 0; background: ' + (i === 3 ? '#B5838A' : '#8E2A35') + '; height: ' + Math.round(v / 115 * 130) + 'px;' }; });
+
+    var products = PRODUCTS.map(function (p) {
+      var tot = p.boxes.reduce(function (a, b) { return a + b[0]; }, 0);
+      var next = p.boxes.map(function (b) { return Date.parse(b[2]); }).filter(function (t) { return t >= TODAY; }).sort()[0];
+      return { name: p.name, origin: p.origin, totKg: kg(tot), count: p.boxes.length, next: next ? fmtD(next).slice(0, 5) : '—', cls: s.prod === p.id ? 'on' : '', pick: set({ prod: p.id }) };
+    });
+    var sp = PRODUCTS.filter(function (p) { return p.id === s.prod; })[0];
+    var sorted = sp.boxes.slice().sort(function (a, b) { return Date.parse(a[2]) - Date.parse(b[2]); });
+    var firstValid = true;
+    var boxes = sorted.map(function (b, i) {
+      var t = Date.parse(b[2]), d = daysLeft(t), st = status(d);
+      if (d >= 0 && firstValid) { st = { status: d <= 14 ? 'Sai primeiro · ' + d + ' dias' : 'Sai primeiro (FEFO)', tone: d <= 14 ? 'warn' : 'info' }; firstValid = false; }
+      return { serial: sp.id.toUpperCase() + '-' + (4810 + i * 7), kg: kg(b[0]), lot: b[1], useBy: fmtD(t), days: d < 0 ? d : '+' + d, loc: b[3], status: st.status, tone: st.tone };
+    });
+    var selKg = sp.boxes.reduce(function (a, b) { return a + b[0]; }, 0);
+
+    var weeks = s.payFreq === 'wk';
+    var f = weeks ? 1 : 52 / 12;
+    var staff = [['Marcos Silva', 'Câmara fria', 'Horista · 45h', 612], ['Ana Costa', 'Separação', 'Horista · 40h', 520], ['Ricardo Lima', 'Motorista', 'Horista · 48h', 668], ['Julia Moura', 'Escritório', 'Salário', 650], ['Pedro Alves', 'Câmara fria', 'Horista · 32h', 416]];
+    var gT = 0, nT = 0;
+    var pay = staff.map(function (r) {
+      var g = r[3] * f, paye = Math.max(0, (g - 242 * f) * 0.2), ni = Math.max(0, (g - 242 * f) * 0.08), n = g - paye - ni;
+      gT += g; nT += n;
+      return { name: r[0], role: r[1], base: r[2], gross: gbp(g), paye: gbp(paye), ni: gbp(ni), net: gbp(n) };
+    });
+
+    return {
+      navA: mk([['painel', 'Painel']]),
+      navB: mk([['receb', 'Recebimento (scan)'], ['stock', 'Stock e lotes'], ['compras', 'Compras'], ['vendas', 'Vendas'], ['inv', 'Invoices']]),
+      navC: mk([['contab', 'Contabilidade'], ['vat', 'VAT, HMRC e banco'], ['pay', 'Payroll']]),
+      isPainel: s.screen === 'painel', isReceb: s.screen === 'receb', isStock: s.screen === 'stock', isCompras: s.screen === 'compras', isVendas: s.screen === 'vendas', isInv: s.screen === 'inv', isContab: s.screen === 'contab', isVat: s.screen === 'vat', isPay: s.screen === 'pay',
+
+      cash: cash,
+      alerts: [
+        { tag: 'Validade', tone: 'warn', text: '2 caixas de Picanha (lote L26271) vencem em 8 dias. Priorizar nos próximos pedidos.' },
+        { tag: 'Bloqueio', tone: 'bad', text: '1 caixa de Oyster Blade (lote 26057) vencida em 16/07 está bloqueada para venda.' },
+        { tag: 'Cobrança', tone: 'bad', text: '2 invoices vencidas somam £18.900. Restaurante Fogo Vivo há 12 dias.' },
+        { tag: 'Chegada', tone: 'info', text: 'PO-1042 da Teys chega em 19/10: 120 caixas, cerca de 2.600 kg.' }
+      ],
+
+      scanInput: s.scanInput,
+      onScanInput: function (e) { self.setState({ scanInput: e.target.value }); },
+      doScan: function () { var r = parseGS1(self.state.scanInput); if (r) self.setState({ scan: r, received: [r].concat(self.state.received) }); },
+      ex1: set({ scanInput: EX1 }), ex2: set({ scanInput: EX2 }),
+      hasScan: !!s.scan, noScan: !s.scan, scan: s.scan || { fields: [] },
+      received: s.received, recCount: s.received.length,
+
+      products: products,
+      sel: { name: sp.name, boxes: boxes, cost: gbp(sp.cost), value: gbp0(selKg * sp.cost) },
+
+      tabPO: s.comprasTab === 'po' ? 'on' : '', tabBills: s.comprasTab === 'bills' ? 'on' : '', setPO: set({ comprasTab: 'po' }), setBills: set({ comprasTab: 'bills' }),
+      showPO: s.comprasTab === 'po', showBills: s.comprasTab === 'bills',
+      pos: [
+        { id: 'PO-1042', sup: 'Teys Australia', boxes: 120, kg: '2.600', eta: '19/10/2026', status: 'Em trânsito', tone: 'info' },
+        { id: 'PO-1041', sup: 'JBS Brasil', boxes: 200, kg: '4.250', eta: '02/11/2026', status: 'No navio', tone: 'info' },
+        { id: 'PO-1039', sup: 'Swift Argentina', boxes: 140, kg: '2.630', eta: '11/10/2026', status: 'Recebido parcial', tone: 'warn' },
+        { id: 'PO-1036', sup: 'Alliance NZ', boxes: 60, kg: '735', eta: '30/09/2026', status: 'Recebido', tone: 'ok' }
+      ],
+      bills: [
+        { id: 'BILL-7781', sup: 'JBS Brasil', type: 'Mercadoria', due: '25/10', amt: '£47.600,00', status: 'A pagar', tone: 'warn' },
+        { id: 'BILL-7779', sup: 'Maersk Line', type: 'Frete marítimo', due: '28/10', amt: '£6.420,00', status: 'A pagar', tone: 'warn' },
+        { id: 'BILL-7776', sup: 'Agente aduaneiro', type: 'Desembaraço', due: '20/10', amt: '£1.180,00', status: 'Aprovada', tone: 'info' },
+        { id: 'BILL-7770', sup: 'Câmara fria Leeds', type: 'Armazenagem', due: '15/10', amt: '£2.950,00', status: 'Vencida', tone: 'bad' },
+        { id: 'BILL-7764', sup: 'Teys Australia', type: 'Mercadoria', due: '10/10', amt: '£38.210,00', status: 'Paga', tone: 'ok' }
+      ],
+
+      tabSO: s.vendasTab === 'so' ? 'on' : '', tabCli: s.vendasTab === 'cli' ? 'on' : '', setSO: set({ vendasTab: 'so' }), setCli: set({ vendasTab: 'cli' }),
+      showSO: s.vendasTab === 'so', showCli: s.vendasTab === 'cli',
+      sos: [
+        { id: 'SO-2231', cli: "The Butcher's Block", items: 'Picanha ×3, Fraldinha ×2', kg: '101,27', tot: '£1.402,10', status: 'Separando', tone: 'info' },
+        { id: 'SO-2230', cli: 'Restaurante Fogo Vivo', items: 'Picanha ×6', kg: '127,40', tot: '£1.898,26', status: 'Aguardando estoque', tone: 'warn' },
+        { id: 'SO-2229', cli: 'Brazilian Groceries', items: 'Picanha ×4, Chicken ×5', kg: '134,10', tot: '£1.512,40', status: 'Pronto p/ entrega', tone: 'ok' },
+        { id: 'SO-2228', cli: 'Smithfield Catering', items: 'Lamb Rack ×3', kg: '36,77', tot: '£842,03', status: 'Entregue', tone: 'ok' },
+        { id: 'SO-2227', cli: 'Hotel Marylebone', items: 'Oyster Blade ×4', kg: '85,65', tot: '£1.168,27', status: 'Entregue', tone: 'ok' }
+      ],
+      clients: [
+        { name: "The Butcher's Block", type: 'Açougue', table: 'Atacado A', terms: '14 dias', bal: '£4.210', lim: '£10.000' },
+        { name: 'Restaurante Fogo Vivo', type: 'Restaurante', table: 'Food service', terms: '30 dias', bal: '£12.640', lim: '£12.000' },
+        { name: 'Brazilian Groceries', type: 'Varejo (grupo)', table: 'Interna', terms: '30 dias', bal: '£8.900', lim: '£25.000' },
+        { name: 'Smithfield Catering', type: 'Food service', table: 'Food service', terms: '30 dias', bal: '£3.120', lim: '£15.000' },
+        { name: 'Hotel Marylebone', type: 'Hotel', table: 'Premium', terms: '21 dias', bal: '£0', lim: '£8.000' }
+      ],
+
+      invs: [
+        { id: 'INV-5531', cli: "The Butcher's Block", iss: '15/10', due: '29/10', amt: '£2.317,03', status: 'Em aberto', tone: 'info' },
+        { id: 'INV-5530', cli: 'Brazilian Groceries', iss: '14/10', due: '13/11', amt: '£1.512,40', status: 'Em aberto', tone: 'info' },
+        { id: 'INV-5524', cli: 'Hotel Marylebone', iss: '08/10', due: '29/10', amt: '£1.168,27', status: 'Paga', tone: 'ok' },
+        { id: 'INV-5509', cli: 'Restaurante Fogo Vivo', iss: '04/09', due: '04/10', amt: '£11.300,00', status: 'Vencida', tone: 'bad' },
+        { id: 'INV-5502', cli: 'Smithfield Catering', iss: '01/09', due: '01/10', amt: '£7.600,00', status: 'Vencida', tone: 'bad' },
+        { id: 'INV-5498', cli: "The Butcher's Block", iss: '28/08', due: '11/09', amt: '£3.980,55', status: 'Paga', tone: 'ok' }
+      ],
+      invLines: [
+        { item: 'Picanha · 3 caixas', detail: '21,45 + 19,80 + 22,10 = 63,35 kg × £14,90/kg · lotes L26271, L26283', total: '£943,92' },
+        { item: 'Fraldinha · 2 caixas', detail: '18,40 + 18,95 = 37,35 kg × £12,40/kg · lote AR4410', total: '£463,14' },
+        { item: 'Lamb Rack · 2 caixas', detail: '12,30 + 11,85 = 24,15 kg × £37,68/kg · lote NZ8812', total: '£909,97' }
+      ],
+
+      tabDRE: s.contabTab === 'dre' ? 'on' : '', tabBal: s.contabTab === 'bal' ? 'on' : '', setDRE: set({ contabTab: 'dre' }), setBal: set({ contabTab: 'bal' }),
+      showDRE: s.contabTab === 'dre', showBal: s.contabTab === 'bal',
+      dre: [
+        { k: 'Receita de vendas', v: '£412.600', cls: '', ind: '' },
+        { k: 'Custo das mercadorias (landed cost)', v: '(£318.200)', cls: '', ind: '' },
+        { k: 'Lucro bruto · 22,9%', v: '£94.400', cls: 'tot', ind: '' },
+        { k: 'Frete e distribuição', v: '(£12.300)', cls: '', ind: 'padding-left: 16px;' },
+        { k: 'Armazenagem fria', v: '(£8.900)', cls: '', ind: 'padding-left: 16px;' },
+        { k: 'Salários e encargos', v: '(£31.500)', cls: '', ind: 'padding-left: 16px;' },
+        { k: 'Aluguel', v: '(£6.000)', cls: '', ind: 'padding-left: 16px;' },
+        { k: 'Outras despesas', v: '(£4.700)', cls: '', ind: 'padding-left: 16px;' },
+        { k: 'Lucro operacional', v: '£31.000', cls: 'tot', ind: '' },
+        { k: 'Juros', v: '(£900)', cls: '', ind: 'padding-left: 16px;' },
+        { k: 'Lucro antes dos impostos', v: '£30.100', cls: 'tot', ind: '' }
+      ],
+      balA: [
+        { k: 'Caixa e bancos', v: '£84.200', cls: '' },
+        { k: 'Contas a receber', v: '£126.450', cls: '' },
+        { k: 'Stock (a custo)', v: '£212.380', cls: '' },
+        { k: 'Veículos refrigerados', v: '£48.000', cls: '' },
+        { k: 'Total do ativo', v: '£471.030', cls: 'tot' }
+      ],
+      balP: [
+        { k: 'Fornecedores', v: '£158.900', cls: '' },
+        { k: 'VAT e PAYE a pagar', v: '£22.140', cls: '' },
+        { k: 'Empréstimo', v: '£60.000', cls: '' },
+        { k: 'Capital social', v: '£100.000', cls: '' },
+        { k: 'Lucros acumulados', v: '£129.990', cls: '' },
+        { k: 'Total passivo + PL', v: '£471.030', cls: 'tot' }
+      ],
+
+      vat: [
+        { k: 'Box 1 · VAT sobre vendas', v: '£1.240,00', cls: '' },
+        { k: 'Box 4 · VAT recuperável (compras)', v: '£6.880,00', cls: '' },
+        { k: 'Box 5 · Valor líquido', v: '−£5.640,00', cls: 'tot' },
+        { k: 'Box 6 · Vendas sem VAT', v: '£1.198.400', cls: '' },
+        { k: 'Box 7 · Compras sem VAT', v: '£1.020.300', cls: '' },
+        { k: 'Resultado', v: 'A receber da HMRC', cls: '' }
+      ],
+      bank: [
+        { d: '15/10', desc: 'FPS BUTCHERS BLOCK LTD', amt: '+£3.980,55', match: 'INV-5498 · valor exato', status: 'Conciliado', tone: 'ok' },
+        { d: '14/10', desc: 'TEYS AUSTRALIA PTY', amt: '−£38.210,00', match: 'BILL-7764', status: 'Conciliado', tone: 'ok' },
+        { d: '14/10', desc: 'HOTEL MARYLEBONE', amt: '+£1.168,27', match: 'INV-5524 · valor exato', status: 'Confirmar', tone: 'warn' },
+        { d: '13/10', desc: 'SHELL FLEET CARD', amt: '−£412,60', match: 'Despesa: combustível', status: 'Confirmar', tone: 'warn' },
+        { d: '12/10', desc: 'TFR 88213 UNKNOWN', amt: '+£2.000,00', match: 'Sem sugestão', status: 'Revisar', tone: 'bad' }
+      ],
+
+      tabWk: weeks ? 'on' : '', tabMo: weeks ? '' : 'on', setWk: set({ payFreq: 'wk' }), setMo: set({ payFreq: 'mo' }),
+      payPeriod: weeks ? 'Semana 29 · até 18/10' : 'Outubro 2026',
+      payGross: gbp(gT), payNet: gbp(nT), pay: pay
+    };
+  }
+}
+</script>
+</body>
+</html>
