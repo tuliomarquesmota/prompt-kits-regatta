@@ -232,8 +232,8 @@ dl {
 }
 .nav {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 6px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -281,4 +281,18 @@ dl {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+}
+@media print {
+  .nav,
+  .btn,
+  .pill {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+    color: #000;
+  }
+  .panel {
+    border: 0;
+  }
 }
