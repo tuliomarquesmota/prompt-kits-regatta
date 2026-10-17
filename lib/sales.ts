@@ -3,7 +3,13 @@ import { supabase } from "./supabase";
 import type { StockBox } from "./stock";
 import type { OrderLine } from "./dispatch";
 
-export type Customer = { id: string; name: string; email: string | null; payment_terms: number };
+export type Customer = {
+  id: string;
+  name: string;
+  email: string | null;
+  payment_terms: number;
+  credit_limit: number | null;
+};
 
 export type OrderSummary = {
   id: string;
@@ -56,17 +62,19 @@ const one = <T>(v: T | T[] | null | undefined): T | null => (Array.isArray(v) ? 
 export async function listCustomers(orgId: string): Promise<Customer[]> {
   const { data, error } = await supabase()
     .from("customers")
-    .select("id, name, email, payment_terms")
+    .select("id, name, email, payment_terms, credit_limit")
     .eq("org_id", orgId)
     .order("name");
   if (error) throw error;
   return data ?? [];
 }
 
-export async function addCustomer(orgId: string, c: Omit<Customer, "id">): Promise<void> {
-  const { error } = await supabase()
-    .from("customers")
-    .insert({ org_id: orgId, ...c });
+/** Cria (id null) ou atualiza um cliente. */
+export async function saveCustomer(orgId: string, id: string | null, c: Omit<Customer, "id">): Promise<void> {
+  const sb = supabase();
+  const { error } = id
+    ? await sb.from("customers").update(c).eq("id", id).eq("org_id", orgId)
+    : await sb.from("customers").insert({ org_id: orgId, ...c });
   if (error) throw error;
 }
 

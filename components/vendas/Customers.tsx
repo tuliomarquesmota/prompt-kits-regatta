@@ -1,15 +1,18 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import type { Org } from "@/lib/offline-db";
-import { addCustomer, errorText, listCustomers, type Customer } from "@/lib/sales";
+import { errorText, listCustomers, money, saveCustomer, type Customer } from "@/lib/sales";
+import { numberText, parseNumber } from "@/lib/products";
 
 type Props = { org: Org; go: (q: string) => void };
 
 export default function Customers({ org, go }: Props) {
   const [list, setList] = useState<Customer[] | null>(null);
+  const [editing, setEditing] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [terms, setTerms] = useState("30");
+  const [limit, setLimit] = useState("");
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ text: string; tone: string } | null>(null);
 
@@ -20,21 +23,41 @@ export default function Customers({ org, go }: Props) {
   }, [org.id]);
   useEffect(load, [load]);
 
+  function reset() {
+    setEditing(null);
+    setName("");
+    setEmail("");
+    setTerms("30");
+    setLimit("");
+  }
+
+  function startEdit(c: Customer) {
+    setEditing(c.id);
+    setName(c.name);
+    setEmail(c.email ?? "");
+    setTerms(String(c.payment_terms));
+    setLimit(numberText(c.credit_limit));
+    setMsg(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim()) return;
+    const credit = parseNumber(limit);
+    if (Number.isNaN(credit))
+      return setMsg({ text: "Limite de crédito inválido. Use só números, ex.: 5000", tone: "bad" });
     setBusy(true);
     setMsg(null);
     try {
-      await addCustomer(org.id, {
+      await saveCustomer(org.id, editing, {
         name: name.trim(),
         email: email.trim() || null,
         payment_terms: Math.max(0, Number(terms) || 0),
+        credit_limit: credit === null ? null : Math.round(credit * 100) / 100,
       });
-      setMsg({ text: `${name.trim()} cadastrado.`, tone: "ok" });
-      setName("");
-      setEmail("");
-      setTerms("30");
+      setMsg({ text: `${name.trim()} ${editing ? "atualizado" : "cadastrado"}.`, tone: "ok" });
+      reset();
       load();
     } catch (err) {
       setMsg({ text: errorText(err), tone: "bad" });
@@ -53,7 +76,7 @@ export default function Customers({ org, go }: Props) {
       </div>
 
       <form className="panel" onSubmit={submit}>
-        <strong>Novo cliente</strong>
+        <strong>{editing ? "Editar cliente" : "Novo cliente"}</strong>
         <label>
           Nome
           <input
@@ -79,9 +102,20 @@ export default function Customers({ org, go }: Props) {
             onChange={e => setTerms(e.target.value)}
           />
         </label>
-        <button className="btn primary" disabled={busy}>
-          Cadastrar cliente
-        </button>
+        <label>
+          Limite de crédito em £ (opcional)
+          <input id="custLimit" inputMode="decimal" value={limit} onChange={e => setLimit(e.target.value)} />
+        </label>
+        <div className="row">
+          <button className="btn primary" disabled={busy} style={{ flex: 1 }}>
+            {editing ? "Salvar" : "Cadastrar cliente"}
+          </button>
+          {editing && (
+            <button type="button" className="btn" onClick={reset}>
+              Cancelar
+            </button>
+          )}
+        </div>
       </form>
 
       {msg && <p className={`note ${msg.tone}`}>{msg.text}</p>}
@@ -96,7 +130,13 @@ export default function Customers({ org, go }: Props) {
               <span className="muted">{c.payment_terms} dias</span>
               <span className="muted" style={{ gridColumn: "1 / -1" }}>
                 {c.email ?? "Sem email"}
+                {c.credit_limit !== null && ` · limite ${money(Number(c.credit_limit))}`}
               </span>
+              <div style={{ gridColumn: "1 / -1", marginTop: 6 }}>
+                <button className="btn small" onClick={() => startEdit(c)} disabled={busy}>
+                  Editar
+                </button>
+              </div>
             </div>
           ))}
         </div>

@@ -3,7 +3,14 @@
 import { openDB, type DBSchema, type IDBPDatabase } from "idb";
 import type { LabelProfile, Reading } from "./labels";
 
-export type Product = { id: string; name: string; gtin: string | null; supplier_id: string | null };
+export type Product = {
+  id: string;
+  name: string;
+  gtin: string | null;
+  supplier_id: string | null;
+  min_box_kg?: number | null;
+  max_box_kg?: number | null;
+};
 export type Location = { id: string; name: string };
 export type Org = { id: string; name: string };
 

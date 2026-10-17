@@ -13,7 +13,7 @@ export async function refreshCatalog(org: Org): Promise<Catalog> {
   const sb = supabase();
   const [profiles, products, locations, suppliers] = await Promise.all([
     sb.from("label_profiles").select("id, supplier_id, match, rules").eq("org_id", org.id),
-    sb.from("products").select("id, name, gtin, supplier_id").eq("org_id", org.id),
+    sb.from("products").select("id, name, gtin, supplier_id, min_box_kg, max_box_kg").eq("org_id", org.id),
     sb.from("locations").select("id, name").eq("org_id", org.id).order("name"),
     sb.from("suppliers").select("id, name").eq("org_id", org.id),
   ]);

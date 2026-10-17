@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Nav from "@/components/Nav";
 import Scanner from "@/components/Scanner";
 import { supabase } from "@/lib/supabase";
@@ -17,6 +18,7 @@ import {
   type PendingBox,
 } from "@/lib/offline-db";
 import { syncPending } from "@/lib/sync";
+import { newProductHref, weightWarning } from "@/lib/products";
 
 type Msg = { text: string; tone: "ok" | "warn" | "bad" | "info" };
 type Row = PendingBox & { sentAt?: string };
@@ -301,6 +303,21 @@ export default function ReceberPage() {
               {w}
             </p>
           ))}
+          {(() => {
+            const p = catalog?.products.find(x => x.gtin === draft.productKey);
+            if (!p)
+              return (
+                <p className="note warn">
+                  Produto ainda não cadastrado. Pode salvar a caixa: ela fica guardada no celular e é enviada assim que
+                  o produto for cadastrado.{" "}
+                  <Link className="btn small" href={newProductHref(draft.productKey, draft.supplierId)}>
+                    Cadastrar produto
+                  </Link>
+                </p>
+              );
+            const w = weightWarning(draft.netWeightKg, p.min_box_kg, p.max_box_kg);
+            return w && <p className="note warn">{w}</p>;
+          })()}
           {draft.missing.includes("serial") && isMolde(draft) && (
             <p className="note info">Aponte a câmera para o código menor da etiqueta para pegar o número da caixa.</p>
           )}
@@ -371,6 +388,11 @@ export default function ReceberPage() {
                 {r.error && !r.sentAt && (
                   <div className="muted" style={{ gridColumn: "1 / -1" }}>
                     {r.error}{" "}
+                    {r.state === "sem_produto" && (
+                      <Link className="btn small" href={newProductHref(r.reading.productKey, r.reading.supplierId)}>
+                        Cadastrar produto
+                      </Link>
+                    )}
                     {r.state === "duplicada" && (
                       <button className="btn small" onClick={() => remove(r.id)}>
                         Remover

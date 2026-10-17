@@ -6,6 +6,7 @@ const ITEMS = [
   { href: "/receber", label: "Receber" },
   { href: "/stock", label: "Stock" },
   { href: "/vendas", label: "Vendas" },
+  { href: "/cadastros", label: "Cadastros" },
   { href: "/equipe", label: "Equipe" },
 ];
 
