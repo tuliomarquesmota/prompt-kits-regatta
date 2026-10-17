@@ -55,6 +55,7 @@ docs/                    plano, decisões, guia de etiquetas, protótipos, fotos
 - Nomes no código (variáveis, funções, tabelas, colunas): **inglês**. Ex.: `netWeightKg`, `boxes`, `use_by`
 - Textos que o usuário vê, comentários e documentação: **português do Brasil**
 - Exceção já existente: as chaves JSON dos perfis de etiqueta (`tipo`, `prefixo_gtin`, `shelf_dias`…) estão em português. Mantenha assim.
+- Exceção: o **documento que vai para o cliente** (invoice impressa/PDF e o resumo copiado) sai em **inglês**, no formato do Reino Unido (£1,234.56, 17/10/2026). Fica em `lib/invoice-doc.ts`. Os botões e avisos em volta continuam em português.
 
 **Banco de dados**
 
