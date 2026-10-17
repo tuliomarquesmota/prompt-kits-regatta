@@ -2,6 +2,7 @@
 import { supabase } from "./supabase";
 import type { StockBox } from "./stock";
 import type { OrderLine } from "./dispatch";
+import type { ShippedBox } from "./returns";
 
 export type Customer = {
   id: string;
@@ -40,6 +41,17 @@ export type InvoiceDetail = {
   customer: { name: string; email: string | null };
   order: string | null;
   lines: { product: string; boxes: number; weight_kg: number; price_kg: number; amount: number; lots: string[] }[];
+  credits: CreditNote[];
+};
+
+export type CreditNote = {
+  id: string;
+  number: string;
+  issued_on: string;
+  reason: string | null;
+  restocked: boolean;
+  total: number;
+  lines: { product: string; boxes: number; weight_kg: number; price_kg: number; amount: number }[];
 };
 
 export const ORDER_STATUS: Record<OrderSummary["status"], { text: string; tone: string }> = {
@@ -226,7 +238,7 @@ export async function getInvoice(invoiceId: string): Promise<InvoiceDetail> {
   const { data, error } = await supabase()
     .from("invoices")
     .select(
-      "id, number, issued_on, due_on, total, status, customers(name, email), shipments(sales_orders(number)), invoice_lines(boxes, weight_kg, price_kg, amount, lots, products(name))",
+      "id, number, issued_on, due_on, total, status, customers(name, email), shipments(sales_orders(number)), invoice_lines(boxes, weight_kg, price_kg, amount, lots, products(name)), credit_notes(id, number, issued_on, reason, restocked, total, credit_note_lines(boxes, weight_kg, price_kg, amount, products(name)))",
     )
     .eq("id", invoiceId)
     .single();
@@ -259,7 +271,89 @@ export async function getInvoice(invoiceId: string): Promise<InvoiceDetail> {
       amount: Number(l.amount),
       lots: l.lots ?? [],
     })),
+    credits: ((data.credit_notes ?? []) as unknown as RawCredit[])
+      .map(c => ({
+        id: c.id,
+        number: c.number,
+        issued_on: c.issued_on,
+        reason: c.reason,
+        restocked: c.restocked,
+        total: Number(c.total),
+        lines: (c.credit_note_lines ?? []).map(l => ({
+          product: l.products?.name ?? "Produto",
+          boxes: l.boxes,
+          weight_kg: Number(l.weight_kg),
+          price_kg: Number(l.price_kg),
+          amount: Number(l.amount),
+        })),
+      }))
+      .sort((a, b) => a.number.localeCompare(b.number)),
   };
+}
+
+type RawCredit = {
+  id: string;
+  number: string;
+  issued_on: string;
+  reason: string | null;
+  restocked: boolean;
+  total: number;
+  credit_note_lines: { boxes: number; weight_kg: number; price_kg: number; amount: number; products: Named }[] | null;
+};
+
+/** Caixas que saíram nesta invoice, marcando as já devolvidas. */
+export async function invoiceBoxes(invoiceId: string): Promise<ShippedBox[]> {
+  const sb = supabase();
+  const { data: inv, error: e1 } = await sb.from("invoices").select("shipment_id").eq("id", invoiceId).single();
+  if (e1) throw e1;
+  const { data, error } = await sb
+    .from("shipment_boxes")
+    .select("price_kg, returned_at, boxes(id, product_id, net_weight_kg, lot, serial, products(name))")
+    .eq("shipment_id", inv.shipment_id);
+  if (error) throw error;
+  type Row = {
+    price_kg: number;
+    returned_at: string | null;
+    boxes: {
+      id: string;
+      product_id: string;
+      net_weight_kg: number;
+      lot: string | null;
+      serial: string | null;
+      products: Named;
+    };
+  };
+  return ((data ?? []) as unknown as Row[])
+    .map(r => {
+      const b = one(r.boxes)!;
+      return {
+        id: b.id,
+        product_id: b.product_id,
+        product_name: one(b.products)?.name ?? "Produto",
+        net_weight_kg: Number(b.net_weight_kg),
+        price_kg: Number(r.price_kg),
+        lot: b.lot,
+        serial: b.serial,
+        returned: r.returned_at !== null,
+      };
+    })
+    .sort((a, b) => a.product_name.localeCompare(b.product_name) || (a.serial ?? "").localeCompare(b.serial ?? ""));
+}
+
+export async function returnBoxes(invoiceId: string, boxIds: string[], reason: string, restock: boolean) {
+  const { data, error } = await supabase().rpc("return_boxes", {
+    invoice_id: invoiceId,
+    box_ids: boxIds,
+    reason,
+    restock,
+  });
+  if (error) throw error;
+  return data as string;
+}
+
+export async function cancelOrder(orderId: string): Promise<void> {
+  const { error } = await supabase().rpc("cancel_order", { order_id: orderId });
+  if (error) throw error;
 }
 
 /** Traduz os erros do banco para frases que a pessoa entende. */

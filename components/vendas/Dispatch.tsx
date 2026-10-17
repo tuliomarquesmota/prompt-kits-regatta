@@ -10,6 +10,7 @@ import { checkPick, isComplete, preview } from "@/lib/dispatch";
 import {
   boxesForProducts,
   brDate,
+  cancelOrder,
   errorText,
   findBox,
   getOrder,
@@ -47,6 +48,7 @@ export default function Dispatch({ orderId, org, go }: Props) {
   const [msg, setMsg] = useState<Msg | null>(null);
   const [busy, setBusy] = useState(false);
   const [confirming, setConfirming] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
   const profiles = useRef<LabelProfile[]>([]);
   const pickedRef = useRef<StockBox[]>([]);
   pickedRef.current = picked;
@@ -141,6 +143,20 @@ export default function Dispatch({ orderId, org, go }: Props) {
       setBusy(false);
       setConfirming(false);
       load();
+    }
+  }
+
+  async function cancel() {
+    if (!order) return;
+    if (!cancelling) return setCancelling(true);
+    setBusy(true);
+    try {
+      await cancelOrder(order.id);
+      go("");
+    } catch (e) {
+      setMsg({ text: errorText(e), tone: "bad" });
+      setBusy(false);
+      setCancelling(false);
     }
   }
 
@@ -301,6 +317,11 @@ export default function Dispatch({ orderId, org, go }: Props) {
             </section>
           );
         })}
+      {open && (
+        <button className="btn" onClick={cancel} disabled={busy}>
+          {cancelling ? "Toque de novo para cancelar o pedido" : "Cancelar pedido"}
+        </button>
+      )}
     </>
   );
 }
