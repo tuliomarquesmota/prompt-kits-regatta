@@ -2,6 +2,7 @@
 import { supabase } from "./supabase";
 import type { BillRow } from "./payables";
 import type { Payment } from "./sales";
+import type { AccountTotal, VatSums } from "./reports";
 
 export type AccountType = "asset" | "liability" | "equity" | "income" | "expense";
 export type Account = {
@@ -222,4 +223,29 @@ export async function postManualEntry(
     lines,
   });
   if (error) throw error;
+}
+
+export async function accountTotals(orgId: string, from: string | null, to: string): Promise<AccountTotal[]> {
+  const { data, error } = await supabase().rpc("report_account_totals", {
+    target_org: orgId,
+    date_from: from,
+    date_to: to,
+  });
+  if (error) throw error;
+  return ((data ?? []) as AccountTotal[]).map(r => ({ ...r, debit: Number(r.debit), credit: Number(r.credit) }));
+}
+
+export async function vatSums(orgId: string, from: string, to: string): Promise<VatSums> {
+  const { data, error } = await supabase().rpc("report_vat", { target_org: orgId, date_from: from, date_to: to });
+  if (error) throw error;
+  const r = ((data ?? []) as Record<string, number>[])[0] ?? {};
+  const n = (k: string) => Number(r[k] ?? 0);
+  return {
+    sales_net: n("sales_net"),
+    sales_vat: n("sales_vat"),
+    credits_net: n("credits_net"),
+    credits_vat: n("credits_vat"),
+    purchases_net: n("purchases_net"),
+    purchases_vat: n("purchases_vat"),
+  };
 }

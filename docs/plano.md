@@ -38,10 +38,10 @@ Integrações atuais que precisam continuar funcionando:
 3. ✅ Recebimento por scan com câmera ao vivo e **modo offline**
 4. ✅ Leitor de etiquetas com perfis por fornecedor (Teys, Silver Fern, Liffey)
 5. ✅ API de stock para o site da SA
-6. ⬜ Stock por produto: cada caixa com peso e validade, FEFO, bloqueio das vencidas
-7. ⬜ Cadastros pelo app: produtos, fornecedores, perfis de etiqueta, locais, clientes
+6. ✅ Stock por produto: cada caixa com peso e validade, FEFO, bloqueio das vencidas
+7. ✅ Cadastros pelo app: produtos, fornecedores, locais, clientes (perfis de etiqueta ainda por SQL)
 8. ⬜ Importar o cadastro atual exportando CSV do SOS
-9. ⬜ Pedido de venda → scan na expedição → invoice pelo peso real
+9. ✅ Pedido de venda → scan na expedição → invoice pelo peso real, cancelamento e devolução com credit note
 10. ⬜ Integração com o QuickBooks (envio das invoices)
 11. ⬜ Rodar em paralelo com o SOS por 2 a 4 semanas. Só desligar o SOS quando o stock dos dois bater
 
@@ -52,6 +52,20 @@ Loja ligada ao stock real, tabela de preço por cliente, cliente B2B faz o próp
 ### Fase 3 · Contabilidade própria
 
 DRE, balanço, VAT. Para enviar VAT à HMRC (Making Tax Digital) o software precisa ser reconhecido por eles. O sócio contador conduz.
+
+Adiantado em out/2026, enquanto a fase 1 espera dados dos sócios:
+
+- ✅ VAT por produto (0, 5, 20%) nas invoices e credit notes
+- ✅ Contas a receber: pagamentos parciais, saldo, atraso por cliente
+- ✅ Contas a pagar: despesas com VAT, pagamentos, vencimentos
+- ✅ Plano de contas padrão (UK, simplificado), editável
+- ✅ Livro contábil automático em partidas dobradas (regime de competência) e lançamento manual
+- ✅ Relatórios: DRE, balanço e prévia do VAT nas 9 caixas, balancete em CSV
+- ⬜ Revisão do contador: plano de contas, taxas de VAT, regras de lançamento
+- ⬜ Contas bancárias separadas e conciliação com o extrato
+- ⬜ Custo da mercadoria vendida por caixa (hoje as compras entram como despesa)
+- ⬜ VAT de importação diferido (postponed VAT accounting)
+- ⬜ Envio do VAT à HMRC (Making Tax Digital)
 
 ### Fase 4 · Caixa da loja (substituir o Epos Now)
 

@@ -12,11 +12,13 @@ import BillView from "@/components/financas/BillView";
 import Accounts from "@/components/financas/Accounts";
 import Ledger from "@/components/financas/Ledger";
 import ManualEntry from "@/components/financas/ManualEntry";
+import Reports from "@/components/financas/Reports";
 
 const TABS = [
   { key: "", label: "A receber" },
   { key: "pagar", label: "A pagar" },
-  { key: "livro", label: "Livro contábil" },
+  { key: "relatorios", label: "Relatórios" },
+  { key: "livro", label: "Livro" },
 ];
 
 /** Finanças numa rota só: ?aba=pagar[&conta=nova|ID] · ?aba=livro[&mes=AAAA-MM|&ver=novo|contas] */
@@ -85,6 +87,7 @@ function Financas() {
       </div>
       {tab === "" && <Receivables org={org} go={go} embedded />}
       {tab === "pagar" && <Bills org={org} go={go} />}
+      {tab === "relatorios" && <Reports org={org} />}
       {tab === "livro" && <Ledger org={org} go={go} month={month} />}
     </>
   );
