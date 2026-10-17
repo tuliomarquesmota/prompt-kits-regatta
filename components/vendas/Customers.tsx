@@ -11,6 +11,7 @@ export default function Customers({ org, go }: Props) {
   const [editing, setEditing] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [address, setAddress] = useState("");
   const [terms, setTerms] = useState("30");
   const [limit, setLimit] = useState("");
   const [busy, setBusy] = useState(false);
@@ -27,6 +28,7 @@ export default function Customers({ org, go }: Props) {
     setEditing(null);
     setName("");
     setEmail("");
+    setAddress("");
     setTerms("30");
     setLimit("");
   }
@@ -35,6 +37,7 @@ export default function Customers({ org, go }: Props) {
     setEditing(c.id);
     setName(c.name);
     setEmail(c.email ?? "");
+    setAddress(c.address ?? "");
     setTerms(String(c.payment_terms));
     setLimit(numberText(c.credit_limit));
     setMsg(null);
@@ -53,6 +56,7 @@ export default function Customers({ org, go }: Props) {
       await saveCustomer(org.id, editing, {
         name: name.trim(),
         email: email.trim() || null,
+        address: address.trim() || null,
         payment_terms: Math.max(0, Number(terms) || 0),
         credit_limit: credit === null ? null : Math.round(credit * 100) / 100,
       });
@@ -92,6 +96,16 @@ export default function Customers({ org, go }: Props) {
           <input id="custEmail" type="email" value={email} onChange={e => setEmail(e.target.value)} />
         </label>
         <label>
+          Endereço (aparece na invoice)
+          <textarea
+            id="custAddress"
+            rows={3}
+            value={address}
+            onChange={e => setAddress(e.target.value)}
+            placeholder={"1 High Street\nLondon\nE1 1AA"}
+          />
+        </label>
+        <label>
           Prazo de pagamento (dias)
           <input
             id="custTerms"
@@ -129,6 +143,7 @@ export default function Customers({ org, go }: Props) {
               <strong>{c.name}</strong>
               <span className="muted">{c.payment_terms} dias</span>
               <span className="muted" style={{ gridColumn: "1 / -1" }}>
+                {c.address ? c.address.split("\n")[0] + " · " : ""}
                 {c.email ?? "Sem email"}
                 {c.credit_limit !== null && ` · limite ${money(Number(c.credit_limit))}`}
               </span>

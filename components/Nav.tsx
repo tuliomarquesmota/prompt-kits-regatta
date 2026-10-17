@@ -14,8 +14,9 @@ const ITEMS = [
 /** Barra com saudação e Sair, e o menu das telas principais, no topo de cada uma. */
 export default function Nav() {
   const path = usePathname();
-  // Equipe fica dentro de Cadastros
-  const active = (href: string) => path === href || (href === "/cadastros" && path === "/equipe");
+  // Empresa e Equipe ficam dentro de Cadastros
+  const active = (href: string) =>
+    path === href || (href === "/cadastros" && (path === "/equipe" || path === "/empresa"));
   return (
     <>
       <TopBar />

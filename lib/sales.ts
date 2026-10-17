@@ -10,6 +10,7 @@ export type Customer = {
   email: string | null;
   payment_terms: number;
   credit_limit: number | null;
+  address: string | null;
 };
 
 export type OrderSummary = {
@@ -38,7 +39,7 @@ export type InvoiceDetail = {
   due_on: string | null;
   total: number;
   status: string;
-  customer: { name: string; email: string | null };
+  customer: { name: string; email: string | null; address: string | null };
   order: string | null;
   vat_total: number;
   lines: {
@@ -96,7 +97,7 @@ const one = <T>(v: T | T[] | null | undefined): T | null => (Array.isArray(v) ? 
 export async function listCustomers(orgId: string): Promise<Customer[]> {
   const { data, error } = await supabase()
     .from("customers")
-    .select("id, name, email, payment_terms, credit_limit")
+    .select("id, name, email, payment_terms, credit_limit, address")
     .eq("org_id", orgId)
     .order("name");
   if (error) throw error;
@@ -260,12 +261,12 @@ export async function getInvoice(invoiceId: string): Promise<InvoiceDetail> {
   const { data, error } = await supabase()
     .from("invoices")
     .select(
-      "id, number, issued_on, due_on, total, vat_total, status, customers(name, email), shipments(sales_orders(number)), invoice_lines(boxes, weight_kg, price_kg, amount, lots, vat_rate, vat_amount, products(name)), payments(id, amount, paid_on, method, note), credit_notes(id, number, issued_on, reason, restocked, total, vat_total, credit_note_lines(boxes, weight_kg, price_kg, amount, products(name)))",
+      "id, number, issued_on, due_on, total, vat_total, status, customers(name, email, address), shipments(sales_orders(number)), invoice_lines(boxes, weight_kg, price_kg, amount, lots, vat_rate, vat_amount, products(name)), payments(id, amount, paid_on, method, note), credit_notes(id, number, issued_on, reason, restocked, total, vat_total, credit_note_lines(boxes, weight_kg, price_kg, amount, products(name)))",
     )
     .eq("id", invoiceId)
     .single();
   if (error) throw error;
-  const cust = one(data.customers as unknown as { name: string; email: string | null });
+  const cust = one(data.customers as unknown as { name: string; email: string | null; address: string | null });
   const ship = one(data.shipments as unknown as { sales_orders: unknown });
   const so = ship ? one(ship.sales_orders as { number: string }) : null;
   const lines = (data.invoice_lines ?? []) as unknown as {
@@ -286,7 +287,7 @@ export async function getInvoice(invoiceId: string): Promise<InvoiceDetail> {
     total: Number(data.total),
     vat_total: Number(data.vat_total),
     status: data.status,
-    customer: { name: cust?.name ?? "—", email: cust?.email ?? null },
+    customer: { name: cust?.name ?? "—", email: cust?.email ?? null, address: cust?.address ?? null },
     order: so?.number ?? null,
     lines: lines.map(l => ({
       product: l.products?.name ?? "Produto",

@@ -1,6 +1,7 @@
 // Cadastros no Supabase: produtos, fornecedores e câmaras.
 import { supabase } from "./supabase";
 import type { ProductRow } from "./products";
+import type { Company } from "./company";
 
 export type Supplier = { id: string; name: string; country: string | null };
 export type Place = { id: string; name: string };
@@ -110,4 +111,25 @@ export async function savePlace(orgId: string, id: string | null, name: string):
 export async function deletePlace(orgId: string, id: string): Promise<void> {
   const { error } = await supabase().from("locations").delete().eq("id", id).eq("org_id", orgId);
   if (error) throw error;
+}
+
+const companyCols =
+  "name, legal_name, company_number, vat_number, address, email, phone, bank_name, bank_account_name, sort_code, account_number, invoice_notes";
+
+export async function getCompany(orgId: string): Promise<Company> {
+  const { data, error } = await supabase().from("organizations").select(companyCols).eq("id", orgId).single();
+  if (error) throw error;
+  return data as Company;
+}
+
+export async function saveCompany(orgId: string, row: Company): Promise<void> {
+  const { data, error } = await supabase().from("organizations").update(row).eq("id", orgId).select("id");
+  if (error) throw error;
+  if (!data?.length) throw { message: "Apenas donos e admins mudam os dados da empresa." };
+}
+
+export async function amAdmin(orgId: string): Promise<boolean> {
+  const { data, error } = await supabase().rpc("is_admin", { target_org: orgId });
+  if (error) return false;
+  return !!data;
 }

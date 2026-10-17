@@ -14,6 +14,8 @@ import {
   type InvoiceDetail,
 } from "@/lib/sales";
 import { sumMoney } from "@/lib/receivables";
+import { getCompany } from "@/lib/registry";
+import { invoiceGaps, type Company } from "@/lib/company";
 
 type Props = { invoiceId: string; org: Org; go: (q: string) => void };
 
@@ -26,7 +28,7 @@ function totals(inv: InvoiceDetail) {
 }
 
 /** Texto pronto para mandar ao cliente por WhatsApp ou email. */
-function summary(inv: InvoiceDetail, orgName: string): string {
+function summary(inv: InvoiceDetail, orgName: string, company: Company | null): string {
   const t = totals(inv);
   const lines = inv.lines.map(
     l => `• ${l.product}: ${l.boxes} cx, ${kgText(l.weight_kg)} × ${money(l.price_kg)}/kg = ${money(l.amount)}`,
@@ -44,6 +46,13 @@ function summary(inv: InvoiceDetail, orgName: string): string {
     ...inv.credits.map(c => `Credit note ${c.number}: − ${money(sumMoney([c.total, c.vat_total]))}`),
     ...(t.paid > 0 ? [`Pago: − ${money(t.paid)}`] : []),
     ...(t.credited > 0 || t.paid > 0 ? [`Saldo a pagar: ${money(t.balance)}`] : []),
+    ...(company?.bank_name && company.sort_code && company.account_number
+      ? [
+          "",
+          `Pagamento: ${company.bank_name} · ${company.bank_account_name ?? company.legal_name ?? company.name}`,
+          `Sort code ${company.sort_code} · Conta ${company.account_number} · Referência ${inv.number}`,
+        ]
+      : []),
   ].join("\n");
 }
 
@@ -60,6 +69,13 @@ export default function InvoiceView({ invoiceId, org, go }: Props) {
   const [copied, setCopied] = useState<string | null>(null);
   const [panel, setPanel] = useState<"none" | "return" | "payment">("none");
   const [done, setDone] = useState<string | null>(null);
+  const [company, setCompany] = useState<Company | null>(null);
+
+  useEffect(() => {
+    getCompany(org.id)
+      .then(setCompany)
+      .catch(() => setCompany(null));
+  }, [org.id]);
 
   const load = useCallback(() => {
     getInvoice(invoiceId)
@@ -71,7 +87,7 @@ export default function InvoiceView({ invoiceId, org, go }: Props) {
   async function copy() {
     if (!inv) return;
     try {
-      await navigator.clipboard.writeText(summary(inv, org.name));
+      await navigator.clipboard.writeText(summary(inv, company?.legal_name ?? org.name, company));
       setCopied("Resumo copiado. Cole no WhatsApp ou no email do cliente.");
     } catch {
       setCopied("Não consegui copiar neste aparelho. Selecione o texto e copie.");
@@ -108,8 +124,17 @@ export default function InvoiceView({ invoiceId, org, go }: Props) {
       <section className="panel" aria-label={`Invoice ${inv.number}`}>
         <div className="row spread" style={{ alignItems: "flex-start" }}>
           <div>
-            <div className="muted">{org.name}</div>
-            <h1 style={{ fontSize: 24 }}>Invoice {inv.number}</h1>
+            <strong>{company?.legal_name ?? company?.name ?? org.name}</strong>
+            {company?.address && (
+              <div className="muted" style={{ whiteSpace: "pre-line" }}>
+                {company.address}
+              </div>
+            )}
+            {company?.vat_number && <div className="muted">VAT {company.vat_number}</div>}
+            {company?.company_number && <div className="muted">Company no. {company.company_number}</div>}
+            <h1 style={{ fontSize: 24, marginTop: 8 }}>
+              {company?.vat_number ? "VAT invoice" : "Invoice"} {inv.number}
+            </h1>
           </div>
           <div style={{ textAlign: "right" }}>
             <div className="muted">Emitida {brDate(inv.issued_on)}</div>
@@ -119,6 +144,11 @@ export default function InvoiceView({ invoiceId, org, go }: Props) {
         <div>
           <div className="muted">Cliente</div>
           <strong>{inv.customer.name}</strong>
+          {inv.customer.address && (
+            <div className="muted" style={{ whiteSpace: "pre-line" }}>
+              {inv.customer.address}
+            </div>
+          )}
           {inv.order && <div className="muted">Pedido {inv.order}</div>}
         </div>
         <div>
@@ -193,7 +223,46 @@ export default function InvoiceView({ invoiceId, org, go }: Props) {
         <p className="muted" style={{ margin: 0 }}>
           Valores pelo peso real de cada caixa expedida.
         </p>
+        {company?.bank_name && company.sort_code && company.account_number && (
+          <div style={{ borderTop: "1px solid var(--line)", paddingTop: 10 }}>
+            <strong>Pagamento por transferência</strong>
+            <div className="muted">
+              {company.bank_name} · {company.bank_account_name ?? company.legal_name ?? company.name}
+            </div>
+            <div className="mono">
+              Sort code {company.sort_code} · Conta {company.account_number}
+            </div>
+            <div className="muted">Use {inv.number} como referência.</div>
+          </div>
+        )}
+        {company?.invoice_notes && (
+          <p className="muted" style={{ margin: 0, whiteSpace: "pre-line" }}>
+            {company.invoice_notes}
+          </p>
+        )}
+        {(company?.email || company?.phone) && (
+          <p className="muted" style={{ margin: 0 }}>
+            {[company.email, company.phone].filter(Boolean).join(" · ")}
+          </p>
+        )}
       </section>
+
+      {(() => {
+        const gaps = invoiceGaps(company, inv.customer.address, inv.vat_total > 0);
+        if (!gaps.length) return null;
+        return (
+          <p className="note warn no-print">
+            Para valer como VAT invoice falta: {gaps.join(", ")}. Preencha em <a href="/empresa">Cadastros → Empresa</a>
+            {gaps.includes("endereço do cliente") && (
+              <>
+                {" "}
+                e em <a href="/vendas?clientes">Vendas → Clientes</a>
+              </>
+            )}
+            .
+          </p>
+        );
+      })()}
 
       <div className="row">
         <button className="btn primary" onClick={copy}>

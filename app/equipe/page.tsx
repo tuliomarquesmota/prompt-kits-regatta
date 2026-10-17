@@ -106,8 +106,8 @@ export default function EquipePage() {
           <h1>Equipe</h1>
           <div className="muted">{org?.name ?? "…"}</div>
         </div>
-        <button className="btn small" onClick={() => router.push("/cadastros")}>
-          ← Cadastros
+        <button className="btn small" onClick={() => router.push("/empresa")}>
+          ← Empresa
         </button>
       </div>
 
