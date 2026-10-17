@@ -30,10 +30,20 @@ export default function LoginPage() {
   }, []);
 
   async function loadOrgs() {
-    const list = await myOrgs();
-    setOrgs(list);
-    if (list.length === 1) return choose(list[0]);
-    setStep("orgs");
+    setBusy(true);
+    try {
+      const list = await myOrgs();
+      setOrgs(list);
+      if (list.length === 1) return choose(list[0]);
+      setStep("orgs");
+    } catch {
+      setMsg({
+        text: "Entrou, mas não consegui carregar sua empresa. Verifique a internet e toque em Entrar de novo.",
+        tone: "bad",
+      });
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function choose(org: Org) {
@@ -52,15 +62,20 @@ export default function LoginPage() {
     setBusy(true);
     setMsg(null);
     const sb = supabase();
-    const { error } =
-      mode === "entrar"
-        ? await sb.auth.signInWithPassword({ email, password })
-        : await sb.auth.signUp({ email, password });
-    setBusy(false);
-    if (error) return setMsg({ text: traduz(error.message), tone: "bad" });
-    const { data } = await sb.auth.getSession();
-    if (!data.session)
-      return setMsg({ text: "Conta criada. Confirme pelo link enviado ao seu email e depois entre.", tone: "ok" });
+    try {
+      const { data, error } =
+        mode === "entrar"
+          ? await sb.auth.signInWithPassword({ email, password })
+          : await sb.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/login` } });
+      if (error) return setMsg({ text: traduz(error.message), tone: "bad" });
+      // Usa a sessão que o login devolveu, sem consultar de novo
+      if (!data.session)
+        return setMsg({ text: "Conta criada. Confirme pelo link enviado ao seu email e depois entre.", tone: "ok" });
+    } catch (err) {
+      return setMsg({ text: traduz((err as Error).message ?? ""), tone: "bad" });
+    } finally {
+      setBusy(false);
+    }
     loadOrgs();
   }
 
