@@ -154,3 +154,72 @@ export async function voidBill(orgId: string, billId: string): Promise<void> {
   const { error } = await sb.from("bills").update({ status: "void" }).eq("id", billId).eq("org_id", orgId);
   if (error) throw error;
 }
+
+export type JournalEntry = {
+  id: string;
+  entry_date: string;
+  description: string;
+  source_table: string | null;
+  source_id: string | null;
+  lines: { account: string; code: string; debit: number; credit: number; memo: string | null }[];
+};
+
+/** Lançamentos de um período, mais recentes primeiro. */
+export async function listEntries(orgId: string, from: string, to: string): Promise<JournalEntry[]> {
+  const { data, error } = await supabase()
+    .from("journal_entries")
+    .select(
+      "id, entry_date, description, source_table, source_id, created_at, journal_lines(debit, credit, memo, accounts(code, name))",
+    )
+    .eq("org_id", orgId)
+    .gte("entry_date", from)
+    .lte("entry_date", to)
+    .order("entry_date", { ascending: false })
+    .order("created_at", { ascending: false })
+    .limit(1000);
+  if (error) throw error;
+  type Raw = {
+    id: string;
+    entry_date: string;
+    description: string;
+    source_table: string | null;
+    source_id: string | null;
+    journal_lines: {
+      debit: number;
+      credit: number;
+      memo: string | null;
+      accounts: { code: string; name: string } | null;
+    }[];
+  };
+  return ((data ?? []) as unknown as Raw[]).map(e => ({
+    id: e.id,
+    entry_date: e.entry_date,
+    description: e.description,
+    source_table: e.source_table,
+    source_id: e.source_id,
+    lines: e.journal_lines
+      .map(l => ({
+        account: l.accounts?.name ?? "Conta",
+        code: l.accounts?.code ?? "",
+        debit: Number(l.debit),
+        credit: Number(l.credit),
+        memo: l.memo,
+      }))
+      .sort((a, b) => b.debit - a.debit),
+  }));
+}
+
+export async function postManualEntry(
+  orgId: string,
+  entryDate: string,
+  description: string,
+  lines: { account_id: string; debit: number; credit: number }[],
+): Promise<void> {
+  const { error } = await supabase().rpc("post_manual_entry", {
+    target_org: orgId,
+    entry_date: entryDate,
+    description,
+    lines,
+  });
+  if (error) throw error;
+}

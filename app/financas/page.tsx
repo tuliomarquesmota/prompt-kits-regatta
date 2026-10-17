@@ -10,14 +10,16 @@ import Bills from "@/components/financas/Bills";
 import NewBill from "@/components/financas/NewBill";
 import BillView from "@/components/financas/BillView";
 import Accounts from "@/components/financas/Accounts";
+import Ledger from "@/components/financas/Ledger";
+import ManualEntry from "@/components/financas/ManualEntry";
 
 const TABS = [
   { key: "", label: "A receber" },
   { key: "pagar", label: "A pagar" },
-  { key: "contas", label: "Plano de contas" },
+  { key: "livro", label: "Livro contábil" },
 ];
 
-/** Finanças numa rota só: ?aba=pagar · ?aba=pagar&conta=nova|ID · ?aba=contas */
+/** Finanças numa rota só: ?aba=pagar[&conta=nova|ID] · ?aba=livro[&mes=AAAA-MM|&ver=novo|contas] */
 function Financas() {
   const router = useRouter();
   const params = useSearchParams();
@@ -45,6 +47,22 @@ function Financas() {
 
   if (tab === "pagar" && conta === "nova") return <NewBill org={org} go={go} />;
   if (tab === "pagar" && conta) return <BillView key={conta} billId={conta} org={org} go={go} />;
+  const ver = params.get("ver");
+  if (tab === "livro" && ver === "novo") return <ManualEntry org={org} go={go} />;
+  if (tab === "livro" && ver === "contas")
+    return (
+      <>
+        <div className="row spread">
+          <h1>Plano de contas</h1>
+          <button className="btn small" onClick={() => go("aba=livro")}>
+            ← Livro
+          </button>
+        </div>
+        <Accounts org={org} />
+      </>
+    );
+  const now = new Date();
+  const month = params.get("mes") ?? `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
   return (
     <>
@@ -67,7 +85,7 @@ function Financas() {
       </div>
       {tab === "" && <Receivables org={org} go={go} embedded />}
       {tab === "pagar" && <Bills org={org} go={go} />}
-      {tab === "contas" && <Accounts org={org} />}
+      {tab === "livro" && <Ledger org={org} go={go} month={month} />}
     </>
   );
 }
