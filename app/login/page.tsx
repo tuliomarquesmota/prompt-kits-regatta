@@ -32,9 +32,12 @@ export default function LoginPage() {
   async function loadOrgs() {
     setBusy(true);
     try {
+      // Entra nas empresas para as quais este email foi convidado
+      const { data: joined } = await supabase().rpc("accept_invitations");
       const list = await myOrgs();
       setOrgs(list);
       if (list.length === 1) return choose(list[0]);
+      if (joined) setMsg({ text: "Você entrou na empresa que te convidou.", tone: "ok" });
       setStep("orgs");
     } catch {
       setMsg({
@@ -143,6 +146,12 @@ export default function LoginPage() {
                 </button>
               ))}
             </section>
+          )}
+          {orgs.length === 0 && (
+            <p className="note info">
+              Foi convidado por alguém? Não crie uma empresa nova: peça para a pessoa conferir se o convite foi para
+              este mesmo email e depois entre de novo.
+            </p>
           )}
           <form className="panel" onSubmit={createOrg}>
             <strong>{orgs.length ? "Ou crie outra empresa" : "Crie sua empresa"}</strong>

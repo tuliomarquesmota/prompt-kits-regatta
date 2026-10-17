@@ -1,7 +1,7 @@
 // Service worker do LOTE: deixa o app abrir e ler etiquetas sem internet.
 // O envio dos dados é feito pela fila no IndexedDB (lib/sync.ts), não aqui.
-const CACHE = "lote-v1";
-const SHELL = ["/receber", "/login", "/manifest.webmanifest", "/icon-192.png", "/icon-512.png"];
+const CACHE = "lote-v2";
+const SHELL = ["/receber", "/login", "/equipe", "/manifest.webmanifest", "/icon-192.png", "/icon-512.png"];
 
 self.addEventListener("install", e => {
   e.waitUntil(
