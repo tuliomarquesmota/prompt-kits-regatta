@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 import Scanner from "@/components/Scanner";
+import LogoutButton from "@/components/LogoutButton";
 import { supabase } from "@/lib/supabase";
 import { getCatalog } from "@/lib/catalog";
 import { currentOrg, setCurrentOrg } from "@/lib/org";
@@ -423,17 +424,7 @@ export default function ReceberPage() {
         </div>
       </section>
 
-      <button
-        className="btn small"
-        style={{ alignSelf: "flex-start" }}
-        onClick={async () => {
-          setCurrentOrg(null);
-          await supabase().auth.signOut();
-          router.replace("/login");
-        }}
-      >
-        Sair
-      </button>
+      <LogoutButton pending={pendingCount} />
     </main>
   );
 }
