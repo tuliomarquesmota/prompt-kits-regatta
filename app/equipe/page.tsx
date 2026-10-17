@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
+import Nav from "@/components/Nav";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { currentOrg } from "@/lib/org";
@@ -100,14 +100,10 @@ export default function EquipePage() {
 
   return (
     <main>
-      <div className="row spread">
-        <div>
-          <h1>Equipe</h1>
-          <div className="muted">{org?.name ?? "…"}</div>
-        </div>
-        <Link className="btn small" href="/receber" style={{ display: "inline-flex", alignItems: "center" }}>
-          Voltar
-        </Link>
+      <Nav />
+      <div>
+        <h1>Equipe</h1>
+        <div className="muted">{org?.name ?? "…"}</div>
       </div>
 
       {!online && <p className="note warn">Sem internet. A equipe só pode ser vista e alterada com conexão.</p>}

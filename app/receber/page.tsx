@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import Nav from "@/components/Nav";
 import Scanner from "@/components/Scanner";
 import { supabase } from "@/lib/supabase";
 import { getCatalog } from "@/lib/catalog";
@@ -233,6 +233,7 @@ export default function ReceberPage() {
   // ---------- tela ----------
   return (
     <main>
+      <Nav />
       <div className="row spread">
         <div>
           <h1>Recebimento</h1>
@@ -400,21 +401,17 @@ export default function ReceberPage() {
         </div>
       </section>
 
-      <div className="row">
-        <Link className="btn small" href="/equipe" style={{ display: "inline-flex", alignItems: "center" }}>
-          Equipe
-        </Link>
-        <button
-          className="btn small"
-          onClick={async () => {
-            setCurrentOrg(null);
-            await supabase().auth.signOut();
-            router.replace("/login");
-          }}
-        >
-          Sair
-        </button>
-      </div>
+      <button
+        className="btn small"
+        style={{ alignSelf: "flex-start" }}
+        onClick={async () => {
+          setCurrentOrg(null);
+          await supabase().auth.signOut();
+          router.replace("/login");
+        }}
+      >
+        Sair
+      </button>
     </main>
   );
 }

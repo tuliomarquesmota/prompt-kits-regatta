@@ -230,3 +230,55 @@ dl {
 .item:last-child {
   border-bottom: 0;
 }
+.nav {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 4px;
+}
+.nav a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border-radius: 9px;
+  color: var(--fg);
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+}
+.nav a.on {
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+.nav a:focus-visible,
+.prod:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+.prod {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 12px;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: var(--fg);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  padding: 12px 0;
+  min-height: 56px;
+  cursor: pointer;
+}
+.prod:last-child {
+  border-bottom: 0;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
