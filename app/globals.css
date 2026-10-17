@@ -308,6 +308,33 @@ dl {
   }
   .panel {
     border: 0;
+    padding: 0;
+    gap: 8px;
+  }
+  /* Invoice cabe numa folha A4 */
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+  body {
+    font-size: 12px;
+    padding: 0;
+  }
+  main {
+    padding: 0;
+    gap: 8px;
+    max-width: none;
+  }
+  .panel h1 {
+    font-size: 20px !important;
+  }
+  .item,
+  .field {
+    padding: 4px 0;
+    font-size: 12px;
+  }
+  .muted {
+    font-size: 12px;
   }
 }
 
