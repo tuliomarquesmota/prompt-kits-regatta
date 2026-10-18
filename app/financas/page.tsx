@@ -15,10 +15,12 @@ import ManualEntry from "@/components/financas/ManualEntry";
 import Reports from "@/components/financas/Reports";
 import Receipts from "@/components/financas/Receipts";
 import ReceiptCost from "@/components/financas/ReceiptCost";
+import CashFlow from "@/components/financas/CashFlow";
 
 const TABS = [
   { key: "", label: "A receber" },
   { key: "pagar", label: "A pagar" },
+  { key: "caixa", label: "Caixa" },
   { key: "relatorios", label: "Relatórios" },
   { key: "livro", label: "Livro" },
 ];
@@ -92,6 +94,7 @@ function Financas() {
       </div>
       {tab === "" && <Receivables org={org} go={go} embedded />}
       {tab === "pagar" && <Bills org={org} go={go} />}
+      {tab === "caixa" && <CashFlow org={org} go={go} />}
       {tab === "relatorios" && <Reports org={org} />}
       {tab === "livro" && <Ledger org={org} go={go} month={month} />}
     </>
