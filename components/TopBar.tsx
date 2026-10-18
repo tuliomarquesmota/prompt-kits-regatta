@@ -4,16 +4,19 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { currentOrg, setCurrentOrg } from "@/lib/org";
 import { listPending } from "@/lib/offline-db";
-import { greetingName } from "@/lib/greeting";
+import { greetingName, isTestOrg } from "@/lib/greeting";
+import { myOrgs, refreshCatalog } from "@/lib/catalog";
+import type { Org } from "@/lib/offline-db";
 
-/** Barra do topo: "Olá, nome", empresa, aviso de sem internet e Sair (com confirmação). */
+/** Barra do topo: "Olá, nome", empresa (com troca), aviso de sem internet e Sair (com confirmação). */
 export default function TopBar() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [fullName, setFullName] = useState("");
   const [org, setOrg] = useState<string>("");
   const [online, setOnline] = useState(true);
-  const [panel, setPanel] = useState<"none" | "sair" | "nome">("none");
+  const [panel, setPanel] = useState<"none" | "sair" | "conta">("none");
+  const [orgs, setOrgs] = useState<Org[]>([]);
   const [pending, setPending] = useState(0);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
@@ -51,6 +54,29 @@ export default function TopBar() {
     setPanel("sair");
   }
 
+  async function openAccount() {
+    if (panel === "conta") return setPanel("none");
+    setMsg(null);
+    setPanel("conta");
+    if (!navigator.onLine) return;
+    try {
+      setOrgs(await myOrgs());
+    } catch {
+      setOrgs([]);
+    }
+  }
+
+  async function switchOrg(o: Org) {
+    setBusy(true);
+    setCurrentOrg(o);
+    try {
+      await refreshCatalog(o);
+    } catch {
+      /* o catálogo é baixado de novo na próxima tela */
+    }
+    window.location.reload();
+  }
+
   async function logout() {
     setBusy(true);
     setCurrentOrg(null);
@@ -79,11 +105,7 @@ export default function TopBar() {
   return (
     <>
       <header className="topbar">
-        <button
-          className="hello"
-          onClick={() => setPanel(panel === "nome" ? "none" : "nome")}
-          aria-label="Mudar como você é chamado"
-        >
+        <button className="hello" onClick={openAccount} aria-label="Seu nome e empresa">
           <strong>Olá{name ? `, ${name}` : ""}</strong>
           {org && <span className="muted">{org}</span>}
         </button>
@@ -95,7 +117,34 @@ export default function TopBar() {
         </div>
       </header>
 
-      {panel === "nome" && (
+      {isTestOrg(org) && (
+        <p className="note warn" style={{ margin: 0, fontWeight: 700 }}>
+          Empresa de TESTE: nada aqui vale de verdade. Para trabalhar na real, toque no seu nome e troque a empresa.
+        </p>
+      )}
+
+      {panel === "conta" && orgs.length > 1 && (
+        <section className="panel" aria-label="Trocar de empresa">
+          <strong>Trocar de empresa</strong>
+          {orgs.map(o => {
+            const current = o.id === currentOrg()?.id;
+            return (
+              <button
+                key={o.id}
+                className={`btn ${current ? "primary" : ""}`}
+                disabled={busy || current}
+                onClick={() => switchOrg(o)}
+              >
+                {o.name}
+                {current && " · atual"}
+                {!current && isTestOrg(o.name) && " · treino"}
+              </button>
+            );
+          })}
+        </section>
+      )}
+
+      {panel === "conta" && (
         <form className="panel" onSubmit={saveName}>
           <label>
             Como quer ser chamado?
