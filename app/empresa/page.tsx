@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Nav from "@/components/Nav";
+import SectionHeader from "@/components/SectionHeader";
+import { CADASTRO_TABS, EMPRESA_TABS, cadastroHref } from "@/components/cadastros/tabs";
 import { supabase } from "@/lib/supabase";
 import { currentOrg, setCurrentOrg } from "@/lib/org";
 import type { Org } from "@/lib/offline-db";
@@ -108,19 +110,15 @@ export default function EmpresaPage() {
   return (
     <main>
       <Nav />
-      <div className="row spread">
-        <div>
-          <h1>Dados da empresa</h1>
-          <div className="muted">Aparecem nas invoices</div>
-        </div>
-        <button className="btn small" onClick={() => router.push("/cadastros")}>
-          ← Cadastros
-        </button>
-      </div>
-
-      <button className="btn" onClick={() => router.push("/equipe")}>
-        Equipe e convites
-      </button>
+      <SectionHeader
+        title="Cadastros"
+        tabs={CADASTRO_TABS}
+        current="empresa"
+        onTab={k => router.push(cadastroHref(k))}
+        sub={EMPRESA_TABS}
+        subCurrent="empresa"
+        onSub={k => router.push(cadastroHref(k))}
+      />
 
       {!loaded && <p className="muted">Carregando…</p>}
       {loaded && !admin && (

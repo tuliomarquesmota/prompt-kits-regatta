@@ -63,7 +63,7 @@ export default function ManualEntry({ org, go }: Props) {
   return (
     <>
       <div className="row spread">
-        <h1>Lançamento manual</h1>
+        <h2>Lançamento manual</h2>
         <button className="btn small" onClick={() => go("aba=livro")}>
           ← Livro
         </button>

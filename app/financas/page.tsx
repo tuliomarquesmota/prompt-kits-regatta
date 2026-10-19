@@ -16,6 +16,7 @@ import Reports from "@/components/financas/Reports";
 import Receipts from "@/components/financas/Receipts";
 import ReceiptCost from "@/components/financas/ReceiptCost";
 import CashFlow from "@/components/financas/CashFlow";
+import SectionHeader from "@/components/SectionHeader";
 import Closing from "@/components/financas/Closing";
 import History from "@/components/financas/History";
 
@@ -25,6 +26,16 @@ const TABS = [
   { key: "caixa", label: "Caixa" },
   { key: "relatorios", label: "Relatórios" },
   { key: "livro", label: "Livro" },
+];
+const LIVRO_TABS = [
+  { key: "", label: "Lançamentos" },
+  { key: "contas", label: "Plano" },
+  { key: "fechamento", label: "Fechar mês" },
+  { key: "historico", label: "Histórico" },
+];
+const PAGAR_TABS = [
+  { key: "", label: "Contas" },
+  { key: "entregas", label: "Custo das entregas" },
 ];
 
 /** Finanças numa rota só: ?aba=pagar[&conta=nova|ID] · ?aba=livro[&mes=AAAA-MM|&ver=novo|contas|fechamento|historico] */
@@ -54,53 +65,50 @@ function Financas() {
   };
 
   const entrega = params.get("entrega");
-  if (tab === "pagar" && entrega) return <ReceiptCost key={entrega} org={org} receiptId={entrega} go={go} />;
-  if (tab === "pagar" && params.get("ver") === "entregas") return <Receipts org={org} go={go} />;
-  if (tab === "pagar" && conta === "nova") return <NewBill org={org} go={go} />;
-  if (tab === "pagar" && conta) return <BillView key={conta} billId={conta} org={org} go={go} />;
   const ver = params.get("ver");
-  if (tab === "livro" && ver === "novo") return <ManualEntry org={org} go={go} />;
-  if (tab === "livro" && ver === "fechamento") return <Closing org={org} go={go} />;
-  if (tab === "livro" && ver === "historico") return <History org={org} go={go} />;
-  if (tab === "livro" && ver === "contas")
-    return (
-      <>
-        <div className="row spread">
-          <h1>Plano de contas</h1>
-          <button className="btn small" onClick={() => go("aba=livro")}>
-            ← Livro
-          </button>
-        </div>
-        <Accounts org={org} />
-      </>
-    );
   const now = new Date();
   const month = params.get("mes") ?? `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
+  // Segunda fileira de abas e qual está ativa
+  const sub = tab === "livro" ? LIVRO_TABS : tab === "pagar" ? PAGAR_TABS : undefined;
+  const subCurrent =
+    tab === "livro"
+      ? ver === "novo" || !ver
+        ? ""
+        : ver
+      : tab === "pagar"
+        ? ver === "entregas" || entrega
+          ? "entregas"
+          : ""
+        : "";
+
+  let body: React.ReactNode;
+  if (tab === "pagar" && entrega) body = <ReceiptCost key={entrega} org={org} receiptId={entrega} go={go} />;
+  else if (tab === "pagar" && ver === "entregas") body = <Receipts org={org} go={go} />;
+  else if (tab === "pagar" && conta === "nova") body = <NewBill org={org} go={go} />;
+  else if (tab === "pagar" && conta) body = <BillView key={conta} billId={conta} org={org} go={go} />;
+  else if (tab === "pagar") body = <Bills org={org} go={go} />;
+  else if (tab === "livro" && ver === "novo") body = <ManualEntry org={org} go={go} />;
+  else if (tab === "livro" && ver === "fechamento") body = <Closing org={org} go={go} />;
+  else if (tab === "livro" && ver === "historico") body = <History org={org} go={go} />;
+  else if (tab === "livro" && ver === "contas") body = <Accounts org={org} />;
+  else if (tab === "livro") body = <Ledger org={org} go={go} month={month} />;
+  else if (tab === "caixa") body = <CashFlow org={org} go={go} />;
+  else if (tab === "relatorios") body = <Reports org={org} />;
+  else body = <Receivables org={org} go={go} embedded />;
+
   return (
     <>
-      <div>
-        <h1>Finanças</h1>
-        <div className="muted">{org.name}</div>
-      </div>
-      <div className="tabs" role="tablist" aria-label="Área das finanças">
-        {TABS.map(t => (
-          <button
-            key={t.key}
-            role="tab"
-            aria-selected={tab === t.key}
-            className={tab === t.key ? "on" : ""}
-            onClick={() => go(t.key ? `aba=${t.key}` : "")}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-      {tab === "" && <Receivables org={org} go={go} embedded />}
-      {tab === "pagar" && <Bills org={org} go={go} />}
-      {tab === "caixa" && <CashFlow org={org} go={go} />}
-      {tab === "relatorios" && <Reports org={org} />}
-      {tab === "livro" && <Ledger org={org} go={go} month={month} />}
+      <SectionHeader
+        title="Finanças"
+        tabs={TABS}
+        current={tab}
+        onTab={k => go(k ? `aba=${k}` : "")}
+        sub={sub}
+        subCurrent={subCurrent}
+        onSub={k => go(`aba=${tab}${k ? `&ver=${k}` : ""}`)}
+      />
+      {body}
     </>
   );
 }

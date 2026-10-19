@@ -72,13 +72,6 @@ export default function Customers({ org, go }: Props) {
 
   return (
     <>
-      <div className="row spread">
-        <h1>Clientes</h1>
-        <button className="btn small" onClick={() => go("")}>
-          ← Pedidos
-        </button>
-      </div>
-
       <form className="panel" onSubmit={submit}>
         <strong>{editing ? "Editar cliente" : "Novo cliente"}</strong>
         <label>

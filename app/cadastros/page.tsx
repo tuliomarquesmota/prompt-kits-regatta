@@ -2,6 +2,8 @@
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Nav from "@/components/Nav";
+import SectionHeader from "@/components/SectionHeader";
+import { CADASTRO_TABS, cadastroHref } from "@/components/cadastros/tabs";
 import { supabase } from "@/lib/supabase";
 import { currentOrg } from "@/lib/org";
 import type { Org } from "@/lib/offline-db";
@@ -17,13 +19,6 @@ import {
   savePlace,
   saveSupplier,
 } from "@/lib/registry";
-
-const TABS = [
-  { key: "", label: "Produtos" },
-  { key: "fornecedores", label: "Fornecedores" },
-  { key: "camaras", label: "Câmaras" },
-  { key: "empresa", label: "Empresa" },
-];
 
 /** Cadastros numa rota só: ?aba=fornecedores · ?aba=camaras · ?produto=novo|ID */
 function Cadastros() {
@@ -56,37 +51,33 @@ function Cadastros() {
   const tab = params.get("aba") ?? "";
   const go = (q: string) => router.push(q ? `/cadastros?${q}` : "/cadastros");
 
+  const header = (
+    <SectionHeader
+      title="Cadastros"
+      tabs={CADASTRO_TABS}
+      current={produto ? "" : tab}
+      onTab={k => router.push(cadastroHref(k))}
+    />
+  );
+
   if (produto)
     return (
-      <ProductEditor
-        key={produto}
-        org={org}
-        productId={produto}
-        presetCode={params.get("codigo")}
-        presetSupplier={params.get("fornecedor")}
-        go={go}
-      />
+      <>
+        {header}
+        <ProductEditor
+          key={produto}
+          org={org}
+          productId={produto}
+          presetCode={params.get("codigo")}
+          presetSupplier={params.get("fornecedor")}
+          go={go}
+        />
+      </>
     );
 
   return (
     <>
-      <div>
-        <h1>Cadastros</h1>
-        <div className="muted">{org.name}</div>
-      </div>
-      <div className="tabs" role="tablist" aria-label="Tipo de cadastro">
-        {TABS.map(t => (
-          <button
-            key={t.key}
-            role="tab"
-            aria-selected={tab === t.key}
-            className={tab === t.key ? "on" : ""}
-            onClick={() => (t.key === "empresa" ? router.push("/empresa") : go(t.key ? `aba=${t.key}` : ""))}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+      {header}
 
       {tab === "" && <Products org={org} go={go} />}
       {tab === "fornecedores" && (

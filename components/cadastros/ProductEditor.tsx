@@ -123,7 +123,7 @@ export default function ProductEditor({ org, productId, presetCode, presetSuppli
   return (
     <>
       <div className="row spread">
-        <h1>{isNew ? "Novo produto" : "Editar produto"}</h1>
+        <h2>{isNew ? "Novo produto" : "Editar produto"}</h2>
         <button className="btn small" onClick={() => go("")}>
           ← Produtos
         </button>

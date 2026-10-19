@@ -79,13 +79,6 @@ export default function Closing({ org, go }: Props) {
 
   return (
     <>
-      <div className="row spread">
-        <h1>Fechar mês</h1>
-        <button className="btn small" onClick={() => go("aba=livro")}>
-          ← Livro
-        </button>
-      </div>
-
       <p className="note info">
         Fechar o mês trava o livro: invoices, pagamentos, contas e lançamentos com data naquele mês não podem mais ser
         criados, mudados nem apagados. Assim os números que foram para o contador e para o VAT não mudam sozinhos.
@@ -188,10 +181,6 @@ export default function Closing({ org, go }: Props) {
           )}
         </form>
       )}
-
-      <button className="btn" onClick={() => go("aba=livro&ver=historico")}>
-        Ver histórico de alterações
-      </button>
     </>
   );
 }

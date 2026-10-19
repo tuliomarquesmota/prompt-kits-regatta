@@ -68,7 +68,7 @@ export default function NewBill({ org, go }: Props) {
   return (
     <>
       <div className="row spread">
-        <h1>Nova conta</h1>
+        <h2>Nova conta</h2>
         <button className="btn small" onClick={() => go("aba=pagar")}>
           ← A pagar
         </button>

@@ -44,22 +44,9 @@ export default function Ledger({ org, go, month }: Props) {
 
   return (
     <>
-      <div className="row">
-        <button className="btn primary" style={{ flex: 1 }} onClick={() => go("aba=livro&ver=novo")}>
-          Lançamento manual
-        </button>
-        <button className="btn" style={{ flex: 1 }} onClick={() => go("aba=livro&ver=contas")}>
-          Plano de contas
-        </button>
-      </div>
-      <div className="row">
-        <button className="btn" style={{ flex: 1 }} onClick={() => go("aba=livro&ver=fechamento")}>
-          Fechar mês
-        </button>
-        <button className="btn" style={{ flex: 1 }} onClick={() => go("aba=livro&ver=historico")}>
-          Histórico
-        </button>
-      </div>
+      <button className="btn primary" onClick={() => go("aba=livro&ver=novo")}>
+        Lançamento manual
+      </button>
 
       <div className="row spread">
         <button

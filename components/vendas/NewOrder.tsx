@@ -84,7 +84,7 @@ export default function NewOrder({ org, go }: Props) {
   return (
     <>
       <div className="row spread">
-        <h1>Novo pedido</h1>
+        <h2>Novo pedido</h2>
         <button className="btn small" onClick={() => go("")}>
           ← Pedidos
         </button>

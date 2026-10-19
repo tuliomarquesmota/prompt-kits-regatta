@@ -22,21 +22,6 @@ export default function OrdersList({ org, go }: Props) {
 
   return (
     <>
-      <div className="row spread">
-        <div>
-          <h1>Vendas</h1>
-          <div className="muted">{org.name}</div>
-        </div>
-        <div className="row">
-          <button className="btn small" onClick={() => go("receber")}>
-            A receber
-          </button>
-          <button className="btn small" onClick={() => go("clientes")}>
-            Clientes
-          </button>
-        </div>
-      </div>
-
       <button className="btn primary" onClick={() => go("novo")}>
         Novo pedido
       </button>

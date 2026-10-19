@@ -68,6 +68,10 @@ h1 {
   margin: 0;
   font-size: 20px;
 }
+h2 {
+  margin: 0;
+  font-size: 18px;
+}
 .panel {
   background: var(--surface);
   border: 1px solid var(--line);
@@ -235,16 +239,22 @@ dl {
 .nav,
 .tabs {
   display: flex;
-  gap: 4px;
+  gap: 2px;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar,
+.subtabs::-webkit-scrollbar {
+  display: none;
 }
 .nav a,
 .tabs button {
   flex: 1 1 auto;
-  padding: 0 6px;
+  padding: 0 4px;
   border: 0;
   background: none;
   font-family: inherit;
@@ -255,15 +265,51 @@ dl {
   justify-content: center;
   min-height: 48px;
   border-radius: 9px;
-  color: var(--fg);
-  font-weight: 600;
+  color: var(--muted);
+  font-weight: 500;
   font-size: 15px;
   text-decoration: none;
 }
 .nav a.on,
 .tabs button.on {
+  padding: 0 8px;
   background: var(--accent);
   color: var(--accent-fg);
+  font-weight: 800;
+}
+.tabs button {
+  font-size: 14px;
+}
+/* Segunda fileira de abas: sublinhado em vez de fundo */
+.subtabs {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--line);
+}
+.subtabs button {
+  flex: 1 1 auto;
+  min-height: 48px;
+  padding: 0 6px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: none;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.subtabs button.on {
+  color: var(--fg);
+  font-weight: 800;
+  border-bottom-color: var(--accent);
+}
+.subtabs button:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: -3px;
 }
 .nav a:focus-visible,
 .tabs button:focus-visible,

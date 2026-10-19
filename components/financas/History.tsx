@@ -40,12 +40,6 @@ export default function History({ org, go }: Props) {
 
   return (
     <>
-      <div className="row spread">
-        <h1>Histórico</h1>
-        <button className="btn small" onClick={() => go("aba=livro")}>
-          ← Livro
-        </button>
-      </div>
       <p className="muted" style={{ margin: 0 }}>
         Quem criou, mudou ou apagou invoices, pagamentos, contas, produtos, preços, clientes, caixas e equipe. Ninguém
         consegue apagar este histórico.

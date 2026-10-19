@@ -66,7 +66,7 @@ export default function BillView({ billId, org, go }: Props) {
       <section className="panel">
         <div>
           <div className="muted">{bill.account}</div>
-          <h1>{bill.payee}</h1>
+          <h2>{bill.payee}</h2>
           {bill.description && <div className="muted">{bill.description}</div>}
         </div>
         <dl>

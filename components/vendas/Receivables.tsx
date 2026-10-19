@@ -33,15 +33,6 @@ export default function Receivables({ org, go, embedded }: Props) {
 
   return (
     <>
-      {!embedded && (
-        <div className="row spread">
-          <h1>A receber</h1>
-          <button className="btn small" onClick={() => go("")}>
-            ← Pedidos
-          </button>
-        </div>
-      )}
-
       {error && <p className="note bad">{error}</p>}
       {!groups && !error && <p className="muted">Carregando…</p>}
 
