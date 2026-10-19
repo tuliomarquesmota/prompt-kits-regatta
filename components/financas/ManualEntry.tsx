@@ -1,10 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import type { Org } from "@/lib/offline-db";
-import { ACCOUNT_TYPE, listAccounts, postManualEntry, type Account } from "@/lib/finance";
-import { checkEntry, type EntryLineForm } from "@/lib/journal";
+import { ACCOUNT_TYPE, getBooksLock, listAccounts, postManualEntry, type Account } from "@/lib/finance";
+import { checkEntry, isLocked, type EntryLineForm } from "@/lib/journal";
 import { parseNumber } from "@/lib/products";
-import { errorText, money } from "@/lib/sales";
+import { brDate, errorText, money } from "@/lib/sales";
 
 type Props = { org: Org; go: (q: string) => void };
 
@@ -18,6 +18,7 @@ const blank = (): EntryLineForm => ({ account_id: "", debit: "", credit: "" });
 export default function ManualEntry({ org, go }: Props) {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [date, setDate] = useState(todayIso());
+  const [lock, setLock] = useState<string | null>(null);
   const [description, setDescription] = useState("");
   const [lines, setLines] = useState<EntryLineForm[]>([blank(), blank()]);
   const [busy, setBusy] = useState(false);
@@ -27,6 +28,9 @@ export default function ManualEntry({ org, go }: Props) {
     listAccounts(org.id)
       .then(a => setAccounts(a.filter(x => x.active)))
       .catch(e => setMsg(errorText(e)));
+    getBooksLock(org.id)
+      .then(setLock)
+      .catch(() => setLock(null));
   }, [org.id]);
 
   const sum = (k: "debit" | "credit") =>
@@ -42,6 +46,7 @@ export default function ManualEntry({ org, go }: Props) {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (isLocked(date, lock)) return setMsg(`O livro está fechado até ${brDate(lock)}. Escolha uma data depois disso.`);
     const c = checkEntry(description, lines);
     if (!c.ok) return setMsg(c.error);
     setBusy(true);
@@ -72,6 +77,11 @@ export default function ManualEntry({ org, go }: Props) {
           Data
           <input type="date" value={date} onChange={e => setDate(e.target.value)} required />
         </label>
+        {isLocked(date, lock) && (
+          <p className="note warn" style={{ margin: 0 }}>
+            Esta data está num mês fechado (livro fechado até {brDate(lock)}). Escolha uma data depois disso.
+          </p>
+        )}
         <label>
           Descrição
           <input

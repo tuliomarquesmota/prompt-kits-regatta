@@ -56,3 +56,23 @@ export function monthLabel(month: string): string {
   const [y, m] = month.split("-").map(Number);
   return `${MONTHS[m - 1]}/${y}`;
 }
+
+/** A data está num período fechado? (datas "AAAA-MM-DD" comparam como texto) */
+export function isLocked(date: string, lockedUntil: string | null): boolean {
+  return !!lockedUntil && date.slice(0, 10) <= lockedUntil;
+}
+
+/**
+ * Próximo mês que pode ser fechado: o mês seguinte ao último fechado ou, se nada foi
+ * fechado, o mês passado. Só vale se o mês já terminou. Devolve "AAAA-MM" ou null.
+ */
+export function nextToClose(lockedUntil: string | null, today: string): string | null {
+  const current = today.slice(0, 7);
+  const next = lockedUntil ? shiftMonth(lockedUntil.slice(0, 7), 1) : shiftMonth(current, -1);
+  return next < current ? next : null;
+}
+
+/** Ao reabrir só o último mês fechado, o livro fica fechado até o fim do mês anterior. */
+export function reopenTarget(lockedUntil: string): string {
+  return monthRange(shiftMonth(lockedUntil.slice(0, 7), -1)).to;
+}

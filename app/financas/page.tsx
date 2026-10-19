@@ -16,6 +16,8 @@ import Reports from "@/components/financas/Reports";
 import Receipts from "@/components/financas/Receipts";
 import ReceiptCost from "@/components/financas/ReceiptCost";
 import CashFlow from "@/components/financas/CashFlow";
+import Closing from "@/components/financas/Closing";
+import History from "@/components/financas/History";
 
 const TABS = [
   { key: "", label: "A receber" },
@@ -25,7 +27,7 @@ const TABS = [
   { key: "livro", label: "Livro" },
 ];
 
-/** Finanças numa rota só: ?aba=pagar[&conta=nova|ID] · ?aba=livro[&mes=AAAA-MM|&ver=novo|contas] */
+/** Finanças numa rota só: ?aba=pagar[&conta=nova|ID] · ?aba=livro[&mes=AAAA-MM|&ver=novo|contas|fechamento|historico] */
 function Financas() {
   const router = useRouter();
   const params = useSearchParams();
@@ -58,6 +60,8 @@ function Financas() {
   if (tab === "pagar" && conta) return <BillView key={conta} billId={conta} org={org} go={go} />;
   const ver = params.get("ver");
   if (tab === "livro" && ver === "novo") return <ManualEntry org={org} go={go} />;
+  if (tab === "livro" && ver === "fechamento") return <Closing org={org} go={go} />;
+  if (tab === "livro" && ver === "historico") return <History org={org} go={go} />;
   if (tab === "livro" && ver === "contas")
     return (
       <>
