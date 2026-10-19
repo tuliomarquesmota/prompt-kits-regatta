@@ -1,7 +1,7 @@
 // Testes da saudação. Rodar: npm test
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { greetingName, isTestOrg } from "./greeting.ts";
+import { greetingName, initial, isTestOrg } from "./greeting.ts";
 
 test("usa o primeiro nome salvo na conta", () => {
   assert.equal(greetingName({ name: "  Túlio Marques " }, "x@y.com"), "Túlio");
@@ -20,4 +20,10 @@ test("reconhece a empresa de treino pelo nome", () => {
   assert.ok(!isTestOrg("SA Global Meat"));
   assert.ok(!isTestOrg("Testa Meats")); // palavra inteira
   assert.ok(!isTestOrg(null));
+});
+
+test("inicial da bolinha da conta", () => {
+  assert.equal(initial("túlio", undefined), "T");
+  assert.equal(initial("", "adriano@x.com"), "A");
+  assert.equal(initial("", undefined), "?");
 });
