@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regatta AW27 · Prompt Kits</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #0b0c0e;
+            color: #dfe3e8;
+            line-height: 1.55;
+        }
+
+        /* ===== NAV FIXA ===== */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(11,12,14,0.92);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #1e2126;
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            gap: 28px;
+        }
+
+        nav .logo {
+            font-weight: 800;
+            font-size: 14px;
+            letter-spacing: 1px;
+            color: #fff;
+        }
+
+        nav .logo span { color: #e8720c; }
+
+        nav a {
+            color: #8b919a;
+            text-decoration: none;
+            font-size: 13px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            transition: all 0.2s;
+        }
+
+        nav a:hover { color: #fff; background: #1a1d22; }
+
+        nav a.ativo {
+            color: #0b0c0e;
+            background: #e8720c;
+            font-weight: 600;
+        }
+
+        nav .contador {
+            margin-left: auto;
+            font-size: 12px;
+            color: #5c626b;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            padding: 48px 28px 32px;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .hero .kicker {
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #e8720c;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .hero h1 {
+            font-size: clamp(32px, 5vw, 52px);
+            font-weight: 800;
+            color: #f5f7fa;
+            line-height: 1.1;
+            margin-bottom: 14px;
+            letter-spacing: -1px;
+        }
+
+        .hero p {
+            font-size: 14px;
+            color: #8b919a;
+            max-width: 640px;
+            margin-bottom: 24px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            background: #14161a;
+            border: 1px solid #1e2126;
+            border-radius: 10px;
+            padding: 12px 18px;
+            font-size: 13px;
+            color: #8b919a;
+        }
+
+        .stat b { color: #f5f7fa; font-size: 16px; display: block; }
+
+        /* ===== SEÇÕES ===== */
+        main {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 28px 80px;
+        }
+
+        section { margin-top: 56px; scroll-margin-top: 80px; }
+
+        .sec-head {
+            display: flex;
+            align-items: baseline;
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        .sec-num {
+            font-size: 13px;
+            font-weight: 800;
+            color: #e8720c;
+        }
+
+        .sec-head h2 {
+            font-size: 24px;
+            color: #f5f7fa;
+            font-weight: 700;
+        }
+
+        .sec-head .dica { font-size: 12px; color: #5c626b; margin-left: auto; }
+
+        /* ===== DECISÕES ===== */
+        .decisoes { display: grid; gap: 10px; max-width: 760px; }
+
+        .decisao {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            background: #14161a;
+            border: 1px solid #1e2126;
+            border-left: 3px solid #e8720c;
+            border-radius: 10px;
+            padding: 14px 18px;
+        }
+
+        .decisao .data {
+            font-size: 11px;
+            color: #e8720c;
+            font-weight: 700;
+            white-space: nowrap;
+            padding-top: 2px;
+        }
+
+        .decisao .txt { font-size: 14px; color: #c9ced4; }
+
+        .add-decisao {
+            margin-top: 14px;
+            display: flex;
+            gap: 10px;
+            max-width: 760px;
+        }
+
+        .add-decisao input {
+            flex: 1;
+            background: #14161a;
+            border: 1px solid #2a2e34;
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: #f5f7fa;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .add-decisao input:focus { border-color: #e8720c; }
+
+        .add-decisao button {
+            background: #e8720c;
+            border: none;
+            color: #0b0c0e;
+            font-weight: 700;
+            border-radius: 8px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* ===== SETS ===== */
+        .sets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+            gap: 18px;
+        }
+
+        .set-card {
+            background: #14161a;
+            border: 1px solid #1e2126;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .set-topo {
+            padding: 18px 22px 14px;
+            border-bottom: 1px solid #1e2126;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .set-topo h3 { font-size: 17px; color: #f5f7fa; margin-bottom: 4px; }
+
+        .set-topo .sub { font-size: 12px; color: #8b919a; }
+
+        .set-topo .sub b { color: #e8720c; font-weight: 600; }
+
+        .set-body { padding: 16px 22px; }
+
+        .set-body .label {
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #5c626b;
+            margin-bottom: 8px;
+        }
+
+        .set-prompt {
+            background: #0b0c0e;
+            border: 1px solid #1e2126;
+            border-radius: 8px;
+            padding: 14px 16px;
+            font-family: Consolas, 'Courier New', monospace;
+            font-size: 12px;
+            color: #b8bec6;
+            white-space: pre-wrap;
+            max-height: 180px;
+            overflow-y: auto;
+            line-height: 1.5;
+        }
+
+        .set-skus {
+            margin-top: 12px;
+            font-size: 12px;
+            color: #5c626b;
+        }
+
+        .set-skus b { color: #8b919a; font-weight: 600; }
+
+        /* ===== BOTÕES COPIAR ===== */
+        .btn-copy {
+            background: #1e2126;
+            border: 1px solid #2a2e34;
+            color: #dfe3e8;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+
+        .btn-copy:hover { background: #2a2e34; border-color: #3a3f47; }
+
+        .btn-copy.ok {
+            background: #14381f;
+            border-color: #1f6b34;
+            color: #6ee7a0;
+        }
+
+        .btn-copy.grande {
+            background: #e8720c;
+            color: #0b0c0e;
+            border: none;
+            font-size: 13px;
+            padding: 10px 22px;
+        }
+
+        .btn-copy.grande:hover { background: #f7860f; }
+
+        .btn-copy.grande.ok { background: #14381f; color: #6ee7a0; }
+
+        /* ===== PRODUTOS ===== */
+        .produtos-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 18px;
+        }
+
+        .prod-card {
+            background: #14161a;
+            border: 1px solid #1e2126;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .prod-card.bloqueado { border-color: #5c2222; }
+
+        .prod-topo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 22px;
+            border-bottom: 1px solid #1e2126;
+            flex-wrap: wrap;
+        }
+
+        .prod-topo .codigo {
+            font-size: 20px;
+            font-weight: 800;
+            color: #f5f7fa;
+            letter-spacing: -0.5px;
+        }
+
+        .prod-topo .cor { font-size: 13px; color: #8b919a; }
+
+        .chip {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .chip.cert { background: #14281a; color: #6ee7a0; border: 1px solid #1f6b34; }
+        .chip.cert.alerta { background: #2a1414; color: #e08a8a; border: 1px solid #5c2222; }
+        .chip.settag { background: #141b28; color: #7fa8d9; border: 1px solid #22364a; }
+        .chip.shottag { background: #1e1a28; color: #a89ad9; border: 1px solid #342a4a; }
+        .chip.pend { background: #2a2114; color: #e8b90c; border: 1px solid #5c4a22; }
+
+        .prod-topo .acoes { margin-left: auto; display: flex; gap: 10px; }
+
+        .prod-corpo {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            min-height: 200px;
+        }
+
+        .prod-info {
+            padding: 18px 22px;
+            border-right: 1px solid #1e2126;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .prod-info .campo label {
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #5c626b;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .prod-info .campo .valor { font-size: 13px; color: #c9ced4; }
+
+        .prod-info textarea {
+            width: 100%;
+            background: #0b0c0e;
+            border: 1px solid #1e2126;
+            border-radius: 8px;
+            padding: 9px 11px;
+            color: #c9ced4;
+            font-size: 12px;
+            font-family: inherit;
+            resize: vertical;
+            outline: none;
+            min-height: 54px;
+        }
+
+        .prod-info textarea:focus { border-color: #e8720c; }
+
+        .aviso-cert {
+            font-size: 12px;
+            padding: 9px 12px;
+            border-radius: 8px;
+            line-height: 1.4;
+        }
+
+        .aviso-cert.ok { background: #14281a; color: #6ee7a0; }
+        .aviso-cert.warn { background: #2a1414; color: #e08a8a; }
+
+        .anexos {
+            font-size: 12px;
+            color: #5c626b;
+        }
+
+        .anexos .slot {
+            display: inline-block;
+            border: 1px dashed #2a2e34;
+            border-radius: 6px;
+            padding: 4px 10px;
+            margin-right: 6px;
+            color: #8b919a;
+        }
+
+        .prod-prompt {
+            padding: 18px 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .bloco-prompt .cabecalho {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .bloco-prompt .label {
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .bloco-prompt .label.pos { color: #e8720c; }
+        .bloco-prompt .label.neg { color: #e08a8a; }
+
+        .texto-prompt {
+            background: #0b0c0e;
+            border: 1px solid #1e2126;
+            border-radius: 8px;
+            padding: 13px 15px;
+            font-family: Consolas, 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            line-height: 1.55;
+            max-height: 210px;
+            overflow-y: auto;
+        }
+
+        .texto-prompt.pos { color: #b8bec6; }
+        .texto-prompt.neg { color: #c49a9a; border-color: #2a1414; }
+
+        .bloqueio {
+            background: #2a1414;
+            border: 1px solid #5c2222;
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 13px;
+            color: #e08a8a;
+        }
+
+        .bloqueio b { color: #f0b0b0; }
+
+        /* ===== CHECKLIST ===== */
+        .checklist {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 16px;
+            padding-top: 4px;
+        }
+
+        .checklist label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #8b919a;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .checklist input { accent-color: #e8720c; cursor: pointer; }
+
+        .checklist label.marcado { color: #6ee7a0; }
+
+        .progresso-check {
+            font-size: 11px;
+            color: #5c626b;
+        }
+
+        .progresso-check.completo { color: #6ee7a0; }
+
+        /* ===== EXPORT ===== */
+        .export-rodape {
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .export-rodape p {
+            font-size: 12px;
+            color: #5c626b;
+            margin-top: 8px;
+        }
+
+        /* ===== TOAST ===== */
+        #toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: #e8720c;
+            color: #0b0c0e;
+            font-weight: 700;
+            font-size: 13px;
+            padding: 12px 26px;
+            border-radius: 30px;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            z-index: 200;
+        }
+
+        #toast.mostrar { transform: translateX(-50%) translateY(0); }
+
+        .rodape {
+            border-top: 1px solid #1e2126;
+            padding: 24px 28px;
+            text-align: center;
+            font-size: 11px;
+            color: #3d4249;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0b0c0e; }
+        ::-webkit-scrollbar-thumb { background: #2a2e34; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3a3f47; }
+
+        /* Responsivo */
+        @media (max-width: 800px) {
+            .prod-corpo { grid-template-columns: 1fr; }
+            .prod-info { border-right: none; border-bottom: 1px solid #1e2126; }
+            .sets-grid { grid-template-columns: 1fr; }
+            nav { flex-wrap: wrap; gap: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="logo">REGATTA <span>AW27</span></div>
+    <a href="#decisoes" data-target="decisoes">Decisões</a>
+    <a href="#sets" data-target="sets">Cenários</a>
+    <a href="#produtos" data-target="produtos">Produtos</a>
+    <span class="contador" id="contador-topo"></span>
+</nav>
+
+<div class="hero">
+    <div class="kicker">ZUT MEDIA × REGATTA PROFESSIONAL</div>
+    <h1>Safety Footwear<br>Prompt Kits</h1>
+    <p>Prompts prontos para 22 imagens de produto — 12 modelos, 4 cenários. Fotos só de produto, sem modelo. Formato 3:4 vertical com espaço para headline no terço de cima.</p>
+    <div class="stats">
+        <div class="stat"><b>22</b>imagens</div>
+        <div class="stat"><b>12</b>modelos</div>
+        <div class="stat"><b>4</b>cenários</div>
+        <div class="stat"><b>3:4</b>vertical</div>
+        <div class="stat"><b>4K</b>saída</div>
+    </div>
+</div>
+
+<main>
+    <!-- DECISÕES -->
+    <section id="decisoes">
+        <div class="sec-head">
+            <span class="sec-num">01</span>
+            <h2>Decisões do Job</h2>
+            <span class="dica">Log de decisões com data</span>
+        </div>
+        <div class="decisoes" id="lista-decisoes"></div>
+        <div class="add-decisao">
+            <input type="text" id="nova-decisao" placeholder="Nova decisão… (ex: usar apenas foto de catálogo como referência)">
+            <button onclick="adicionarDecisao()">Salvar</button>
+        </div>
+    </section>
+
+    <!-- SETS -->
+    <section id="sets">
+        <div class="sec-head">
+            <span class="sec-num">02</span>
+            <h2>Cenários — Sets Vazios</h2>
+            <span class="dica">Prompts do fundo sem produto · botão copiar</span>
+        </div>
+        <div class="sets-grid" id="grid-sets"></div>
+    </section>
+
+    <!-- PRODUTOS -->
+    <section id="produtos">
+        <div class="sec-head">
+            <span class="sec-num">03</span>
+            <h2>Produtos — 22 SKUs</h2>
+            <span class="dica">Prompt completo + negative · copiar com um clique</span>
+        </div>
+        <div class="produtos-grid" id="grid-produtos"></div>
+
+        <div class="export-rodape">
+            <button class="btn-copy grande" onclick="exportarPython()">▶ Gerar prompt kit (pastas + .txt)</button>
+            <p>O script Python lê os dados deste HTML — nada é duplicado em outro lugar.</p>
+        </div>
+    </section>
+</main>
+
+<div class="rodape">REGATTA PROFESSIONAL · AW27 SAFETY FOOTWEAR · PROMPT KIT SYSTEM · OFFLINE</div>
+
+<div id="toast">Copiado!</div>
+
+<script>
+/* ============================================================
+   DADOS — edite aqui (cores, certificações, descrições)
+   ============================================================ */
+
+const JOB = {
+    cliente: 'Regatta Professional',
+    temporada: 'AW27 Safety Footwear',
+    pastaSaida: 'O:\\04 AI\\_PROMPT KITS FOOTWEAR',
+    decisoes: [
+        { data: '20/10/2026', txt: 'Fotos só de produto, sem modelo' },
+        { data: '20/10/2026', txt: 'Sets fixos primeiro, produtos depois (produtos ainda podem mudar)' },
+        { data: '20/10/2026', txt: 'Regras de certificação S1/SB' }
+    ]
+};
+
+const SETS = [
+    {
+        id: 'set1', nome: 'Logistics Clean', num: 'SET 1',
+        tipo: 'Indoor · Limpo', ambiente: 'clean',
+        tags: ['armazém', 'concreto polido', 'faixa amarela'],
+        promptVazio: `Single vertical photograph in 3:4 portrait format, one image only: not a collage, no split screen, no text, no logos, no signage.
+Photorealistic empty set for a Regatta Professional AW27 safety footwear campaign: Logistics / Warehouse, indoor and clean. No people, no shoes, no product: the set only, ready for a product to be placed later.
+SCENE: a modern, clean, well-organised logistics warehouse. In the foreground, a smooth, lightly polished grey concrete floor with a faint soft reflection and a thin painted yellow floor-marking line running diagonally. In the background, tall blue and orange pallet racking with neatly stacked cardboard boxes and shrink-wrapped pallets, and a closed metal roller shutter door, all softly out of focus.
+FRAMING: low camera at floor level, as if photographing a shoe. The centre of the floor in the lower half is empty and clear, a sharp, well-lit spot where a single shoe will stand. The floor is in sharp focus there and falls off to a soft blur behind. The upper third is calmer and less busy, with room for a headline.
+MOOD: professional, tidy, light-duty work. Nothing dirty, no mud, no water, no debris, no construction equipment.
+LIGHT: bright, clean overhead warehouse light with a soft key light on the empty spot, a natural soft shadow area on the floor. Neutral white balance, no colour grading, no purple or blue cast, sharp focus, 4K.`
+    },
+    {
+        id: 'set1b', nome: 'Logistics Wet', num: 'SET 1b',
+        tipo: 'Outdoor · Molhado', ambiente: 'wet',
+        tags: ['pátio pós-chuva', 'poças rasas', 'reflexos'],
+        promptVazio: `Single vertical photograph in 3:4 portrait format, one image only: not a collage, no split screen, no text, no logos, no signage.
+Photorealistic empty set for a Regatta Professional AW27 safety footwear campaign: Logistics / Warehouse, outdoor and wet. No people, no shoes, no product: the set only, ready for a product to be placed later.
+SCENE: the outdoor yard of a logistics depot just after rain. Wet grey concrete and block paving with shallow rain puddles reflecting the sky, a few wet leaves, a painted yellow line. Background: loading bays with closed roller shutter doors, a parked delivery van and stacked pallets, softly out of focus.
+FRAMING: low camera at floor level, as if photographing a shoe. The centre in the lower half is empty and clear, a sharp, well-lit spot where a single shoe will stand. Wet surfaces in soft focus behind. The upper third is calmer, with room for a headline.
+MOOD: professional, post-rain logistics yard. Shallow puddles allowed, no mud, no construction debris, no heavy equipment.
+LIGHT: soft overcast daylight, natural reflections on wet surfaces, neutral white balance, sharp focus, 4K.`
+    },
+    {
+        id: 'set2', nome: 'Manufacturing', num: 'SET 2',
+        tipo: 'Indoor · Industrial · Seco', ambiente: 'dry',
+        tags: ['fábrica', 'máquinas ao fundo', 'seco'],
+        promptVazio: `Single vertical photograph in 3:4 portrait format, one image only: not a collage, no split screen, no text, no logos, no signage.
+Photorealistic empty set for a Regatta Professional AW27 safety footwear campaign: Manufacturing / Factory, indoor and dry. No people, no shoes, no product: the set only, ready for a product to be placed later.
+SCENE: a clean manufacturing floor. Smooth grey concrete in the foreground with faint industrial markings. Background: industrial machinery, metal shelving, safety cones and pallets, softly out of focus. No oil, no grease, no liquids.
+FRAMING: low camera at floor level, as if photographing a shoe. The centre of the floor in the lower half is empty and clear, a sharp, well-lit spot where a single shoe will stand. The upper third is calmer, with room for a headline.
+MOOD: industrial, dry, safety-focused. No mud, no water, no oil stains, no debris.
+LIGHT: bright factory overhead lighting, soft key light on the empty spot, neutral white balance, sharp focus, 4K.`
+    },
+    {
+        id: 'set3', nome: 'Construction', num: 'SET 3',
+        tipo: 'Outdoor · Lama', ambiente: 'mud',
+        tags: ['obra', 'lama', 'respingos'],
+        promptVazio: `Single vertical photograph in 3:4 portrait format, one image only: not a collage, no split screen, no text, no logos, no signage.
+Photorealistic empty set for a Regatta Professional AW27 safety footwear campaign: Construction / Outdoor, muddy. No people, no shoes, no product: the set only, ready for a product to be placed later.
+SCENE: a muddy construction site. Wet brown earth and muddy ground in the foreground with shallow puddles and mud splatter patterns. Background: construction equipment, scaffolding, building materials, softly out of focus.
+FRAMING: low camera at ground level, as if photographing a shoe. The centre in the lower half is empty and clear, a sharp, well-lit spot where a single shoe will stand. Mud and splatter elements around the edges. The upper third is calmer, with room for a headline.
+MOOD: rugged, outdoor, heavy-duty construction. Mud and splatter allowed, no clean warehouse, no office setting.
+LIGHT: natural daylight, soft shadows, neutral white balance, sharp focus, 4K.`
+    }
+];
+
+const NEG = {
+    set1:  'people, person, legs, feet, shoe on foot, human, model, collage, split screen, text, logo, signage, watermark, dirty, mud, water, puddle, debris, construction equipment, blurry, low resolution, distorted, extra limbs, bad anatomy, signature, frame, border',
+    set1b: 'people, person, legs, feet, shoe on foot, human, model, collage, split screen, text, logo, signage, watermark, dry, dusty, thick mud, construction debris, heavy machinery, blurry, low resolution, distorted, extra limbs, bad anatomy, signature, frame, border',
+    set2:  'people, person, legs, feet, shoe on foot, human, model, collage, split screen, text, logo, signage, watermark, mud, water, puddle, oil, grease, liquid, debris, construction site, blurry, low resolution, distorted, extra limbs, bad anatomy, signature, frame, border',
+    set3:  'people, person, legs, feet, shoe on foot, human, model, collage, split screen, text, logo, signage, watermark, clean, polished, warehouse, office, dry dust, blurry, low resolution, distorted, extra limbs, bad anatomy, signature, frame, border'
+};
+
+const RULES = {
+    S1: 'S1 · Proibido água e lama — apenas set 1 e 2.',
+    SB: 'SB · Proibido água e lama — apenas set 1 e 2.',
+    S3: 'S3 · Permitido em todos os sets.',
+    S5: 'S5 · Permitido em todos os sets.'
+};
+
+const PRODUCTS = [
+    // SET 1 — LOGISTICS CLEAN
+    { code: 'TRK200', colour: 'Black/Granit', cert: 'S3', set: 'set1', shot: 'grounded', shoe: 'black and grey safety trainer with a composite toe cap and chunky black sole', note: '' },
+    { code: 'TRK200', colour: 'Briar/Lime', cert: 'S3', set: 'set1', shot: 'grounded', shoe: 'brown and lime safety trainer with a composite toe cap and rugged sole', note: '' },
+    { code: 'TRK204', colour: '[COLOUR 1]', cert: 'S1', set: 'set1', shot: 'grounded', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'pendente' },
+    { code: 'TRK232', colour: '[COLOUR 1]', cert: 'SB', set: 'set1', shot: 'grounded', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'pendente' },
+    { code: 'TRK232', colour: '[COLOUR 2]', cert: 'SB', set: 'set1', shot: 'grounded', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'pendente' },
+    { code: 'TRK233', colour: '[COLOUR 1]', cert: 'S1', set: 'set1', shot: 'grounded', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'pendente' },
+    { code: 'TRK233', colour: '[COLOUR 2]', cert: 'S1', set: 'set1', shot: 'grounded', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'pendente' },
+    { code: 'TRK236', colour: '[COLOUR 1]', cert: 'S3', set: 'set1', shot: 'grounded', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'pendente' },
+    // SET 1b — LOGISTICS WET
+    { code: 'TRK227', colour: 'Granite/Red', cert: 'S3', set: 'set1b', shot: 'grounded', shoe: 'granite and red waterproof safety shoe with reinforced toe and lug sole', note: '' },
+    { code: 'TRK227', colour: 'Black/Granit', cert: 'S3', set: 'set1b', shot: 'grounded', shoe: 'black and granite waterproof safety shoe with reinforced toe and lug sole', note: '' },
+    // SET 2 — MANUFACTURING
+    { code: 'TRK201', colour: '[COLOUR 1]', cert: 'SB', set: 'set2', shot: 'grounded', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'pendente' },
+    { code: 'TRK201', colour: '[COLOUR 2]', cert: 'SB', set: 'set2', shot: 'grounded', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'pendente' },
+    { code: 'TRK205', colour: '[COLOUR 1]', cert: 'S1', set: 'set2', shot: 'grounded', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'pendente' },
+    { code: 'TRK205', colour: '[COLOUR 2]', cert: 'S1', set: 'set2', shot: 'grounded', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'pendente' },
+    { code: 'TRK243', colour: '[COLOUR 1]', cert: 'S3', set: 'set2', shot: 'grounded', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'pendente' },
+    { code: 'TRK243', colour: '[COLOUR 2]', cert: 'S3', set: 'set2', shot: 'grounded', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'pendente' },
+    // SET 3 — CONSTRUCTION
+    { code: 'TRK228', colour: '[COLOUR 1]', cert: 'S3', set: 'set3', shot: 'floating', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'pendente' },
+    { code: 'TRK228', colour: '[COLOUR 2]', cert: 'S3', set: 'set3', shot: 'floating', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'pendente' },
+    { code: 'TRK234', colour: '[COLOUR 1]', cert: 'S5', set: 'set3', shot: 'grounded', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'pendente' },
+    { code: 'TRK234', colour: '[COLOUR 2]', cert: 'S5', set: 'set3', shot: 'grounded', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'pendente' },
+    { code: 'TRK235', colour: '[COLOUR 1]', cert: 'S5', set: 'set3', shot: 'floating', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'pendente' },
+    { code: 'TRK235', colour: '[COLOUR 2]', cert: 'S5', set: 'set3', shot: 'floating', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'pendente' }
+];
+
+const CHECKLIST = ['Sem pessoa', 'Sem pernas', 'Sem pé no calçado', 'Formato 3:4', 'Terço de cima calmo', 'Só produto'];
+
+/* ============================================================
+   LÓGICA
+   ============================================================ */
+
+const getSet = id => SETS.find(s => s.id === id);
+
+function validar(p) {
+    const set = getSet(p.set);
+    const erros = [];
+    if ((p.cert === 'S1' || p.cert === 'SB') && (set.ambiente === 'wet' || set.ambiente === 'mud')) {
+        erros.push(`Certificação ${p.cert} não pode aparecer em ${set.ambiente === 'wet' ? 'água/poça' : 'lama'}.`);
+    }
+    if (p.code === 'TRK227' && set.ambiente === 'mud') {
+        erros.push('TRK227 é impermeável, mas não vai para cenário de obra pesada (lama).');
+    }
+    return { ok: erros.length === 0, erros, regra: RULES[p.cert] || 'Verificar restrições no brief.' };
+}
+
+function gerarPrompt(p) {
+    const v = validar(p);
+    if (!v.ok) return null;
+    const set = getSet(p.set);
+    const shot = p.shot === 'grounded'
+        ? 'The shoe stands firmly on the ground surface, flat and stable.'
+        : 'The shoe floats slightly above the ground, isolated, with no contact with the surface.';
+    return `${set.promptVazio}
+
+PRODUCT: ${p.shoe}. Colour: ${p.colour}. Certification: ${p.cert}.
+PLACEMENT: ${shot}
+COMPOSITION: vertical 3:4, upper third calm for headline, lower third sharp focus on product area, no people, no legs, no feet inside shoe, product only, photorealistic, 4K, commercial advertising style.`;
+}
+
+function gerarNeg(p) {
+    let neg = NEG[p.set] || NEG.set1;
+    if (p.shot === 'floating') neg += ', standing on ground, contact with surface, shadow under shoe touching floor';
+    return neg;
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+
+function esc(s) { return s.replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>'); }
+
+function renderDecisoes() {
+    document.getElementById('lista-decisoes').innerHTML = JOB.decisoes.map(d =>
+        `<div class="decisao"><span class="data">${d.data}</span><span class="txt">${esc(d.txt)}</span></div>`
+    ).join('');
+}
+
+function adicionarDecisao() {
+    const inp = document.getElementById('nova-decisao');
+    if (!inp.value.trim()) return;
+    JOB.decisoes.push({ data: new Date().toLocaleDateString('pt-BR'), txt: inp.value.trim() });
+    inp.value = '';
+    renderDecisoes();
+}
+
+function renderSets() {
+    document.getElementById('grid-sets').innerHTML = SETS.map(set => {
+        const skus = PRODUCTS.filter(p => p.set === set.id);
+        const listaSkus = skus.map(p => `${p.code} ${p.colour}`).join(' · ');
+        return `
+        <div class="set-card">
+            <div class="set-topo">
+                <div>
+                    <h3>${set.num} — ${set.nome}</h3>
+                    <div class="sub">${set.tipo} · <b>${skus.length} SKUs</b></div>
+                    <div style="margin-top:8px">${set.tags.map(t => `<span class="chip settag" style="margin-right:6px">${t}</span>`).join('')}</div>
+                </div>
+                <button class="btn-copy" onclick="copiarSet(this, '${set.id}')">Copiar</button>
+            </div>
+            <div class="set-body">
+                <div class="label">PROMPT DO SET VAZIO</div>
+                <div class="set-prompt">${esc(set.promptVazio)}</div>
+                <div class="set-skus"><b>Usado por:</b> ${listaSkus}</div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function renderProdutos() {
+    document.getElementById('grid-produtos').innerHTML = PRODUCTS.map((p, i) => {
+        const set = getSet(p.set);
+        const v = validar(p);
+        const prompt = v.ok ? gerarPrompt(p) : null;
+        const neg = gerarNeg(p);
+        const idx = `${i}`;
+
+        const chips = `
+            <span class="chip cert ${v.ok ? '' : 'alerta'}">${p.cert}</span>
+            <span class="chip settag">${set.num}</span>
+            <span class="chip shottag">${p.shot}</span>
+            ${p.note ? '<span class="chip pend">pendente</span>' : ''}`;
+
+        const promptHtml = v.ok
+            ? `<div class="bloco-prompt">
+                   <div class="cabecalho">
+                       <span class="label pos">PROMPT COMPLETO</span>
+                       <button class="btn-copy" onclick="copiarPrompt(this, ${i})">Copiar prompt</button>
+                   </div>
+                   <div class="texto-prompt pos" id="txt-${i}">${esc(prompt)}</div>
+               </div>`
+            : `<div class="bloqueio"><b>Combinação proibida:</b><br>${v.erros.join('<br>')}</div>`;
+
+        return `
+        <div class="prod-card ${v.ok ? '' : 'bloqueado'}">
+            <div class="prod-topo">
+                <div>
+                    <span class="codigo">${p.code}</span>
+                    <span class="cor">${p.colour}</span>
+                </div>
+                ${chips}
+                <div class="acoes">
+                    ${v.ok ? `<button class="btn-copy" onclick="copiarTudo(this, ${i})">Copiar tudo</button>` : ''}
+                </div>
+            </div>
+            <div class="prod-corpo">
+                <div class="prod-info">
+                    <div class="campo">
+                        <label>Descrição do calçado</label>
+                        <textarea onchange="editarShoe(${i}, this.value)">${esc(p.shoe)}</textarea>
+                    </div>
+                    <div class="campo">
+                        <label>Certificação</label>
+                        <div class="aviso-cert ${v.ok ? 'ok' : 'warn'}">${v.regra}</div>
+                    </div>
+                    <div class="campo">
+                        <label>Anexos</label>
+                        <div class="anexos"><span class="slot">[foto produto]</span><span class="slot">[foto alt.]</span></div>
+                    </div>
+                </div>
+                <div class="prod-prompt">
+                    ${promptHtml}
+                    <div class="bloco-prompt">
+                        <div class="cabecalho">
+                            <span class="label neg">NEGATIVE PROMPT</span>
+                            <button class="btn-copy" onclick="copiarNeg(this, ${i})">Copiar negative</button>
+                        </div>
+                        <div class="texto-prompt neg">${esc(neg)}</div>
+                    </div>
+                    <div class="checklist" onchange="atualizarCheck(${i})" id="check-${i}">
+                        ${CHECKLIST.map(c => `<label><input type="checkbox"> ${c}</label>`).join('')}
+                        <span class="progresso-check" id="prog-${i}">0 / ${CHECKLIST.length}</span>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+
+    document.getElementById('contador-topo').textContent = `${PRODUCTS.length} imagens · ${SETS.length} sets`;
+}
+
+function editarShoe(i, valor) {
+    PRODUCTS[i].shoe = valor;
+    renderProdutos();
+}
+
+function atualizarCheck(i) {
+    const box = document.getElementById(`check-${i}`);
+    const marcados = box.querySelectorAll('input:checked').length;
+    const prog = document.getElementById(`prog-${i}`);
+    prog.textContent = `${marcados} / ${CHECKLIST.length}`;
+    prog.className = marcados === CHECKLIST.length ? 'progresso-check completo' : 'progresso-check';
+    box.querySelectorAll('label').forEach(l => {
+        l.className = l.querySelector('input').checked ? 'marcado' : '';
+    });
+}
+
+/* ============================================================
+   COPIAR
+   ============================================================ */
+
+function copiar(btn, texto) {
+    navigator.clipboard.writeText(texto).then(() => {
+        const original = btn.textContent;
+        btn.textContent = '✓ Copiado';
+        btn.classList.add('ok');
+        toast();
+        setTimeout(() => { btn.textContent = original; btn.classList.remove('ok'); }, 1600);
+    });
+}
+
+function copiarSet(btn, setId) {
+    const set = getSet(setId);
+    if (set) copiar(btn, set.promptVazio);
+}
+
+function copiarPrompt(btn, i) {
+    const p = PRODUCTS[i];
+    const prompt = gerarPrompt(p);
+    if (prompt) copiar(btn, prompt);
+}
+
+function copiarNeg(btn, i) {
+    copiar(btn, gerarNeg(PRODUCTS[i]));
+}
+
+function copiarTudo(btn, i) {
+    const p = PRODUCTS[i];
+    const prompt = gerarPrompt(p);
+    const neg = gerarNeg(p);
+    copiar(btn, `PROMPT:\n\n${prompt}\n\n\nNEGATIVE PROMPT:\n\n${neg}`);
+}
+
+function toast() {
+    const t = document.getElementById('toast');
+    t.classList.add('mostrar');
+    setTimeout(() => t.classList.remove('mostrar'), 1800);
+}
+
+function exportarPython() {
+    alert('Rode o script export_prompt_kits.py na mesma pasta deste HTML.\nEle lê os dados daqui e cria a estrutura de pastas com os .txt.');
+}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+document.querySelectorAll('nav a').forEach(a => {
+    a.addEventListener('click', function(e) {
+        const el = document.getElementById(this.dataset.target);
+        if (el) {
+            e.preventDefault();
+            el.scrollIntoView({ behavior: 'smooth' });
+            document.querySelectorAll('nav a').forEach(x => x.classList.remove('ativo'));
+            this.classList.add('ativo');
+        }
+    });
+});
+
+/* INIT */
+renderDecisoes();
+renderSets();
+renderProdutos();
+</script>
+
+</body>
+</html>

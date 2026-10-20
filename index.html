@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Kits — Regatta Professional AW27 Safety Footwear</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f0f0f;
+            color: #e8e8e8;
+            line-height: 1.5;
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            background: #141414;
+            border-bottom: 1px solid #2a2a2a;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+        }
+
+        header .top-bar {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        header h1 {
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 14px;
+            color: #aaa;
+            max-width: 700px;
+        }
+
+        /* Tags row */
+        .tags-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 16px 0 24px 0;
+        }
+
+        .tag {
+            background: #1f1f1f;
+            border: 1px solid #333;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 12px;
+            color: #bbb;
+        }
+
+        .tag.accent { border-color: #4a90d9; color: #4a90d9; }
+
+        /* Nav steps com âncoras */
+        .nav-steps {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 32px;
+            font-size: 14px;
+            color: #888;
+        }
+
+        .nav-steps a {
+            color: #888;
+            text-decoration: none;
+            cursor: pointer;
+            padding-bottom: 4px;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav-steps a:hover {
+            color: #fff;
+            border-bottom-color: #4a90d9;
+        }
+
+        .nav-steps a.active {
+            color: #fff;
+            font-weight: 600;
+            border-bottom-color: #4a90d9;
+        }
+
+        /* Section */
+        section {
+            margin-bottom: 40px;
+            padding-top: 80px; /* espaço para o header fixo se necessário */
+            margin-top: -80px;
+        }
+
+        h2 {
+            font-size: 22px;
+            color: #fff;
+            margin-bottom: 16px;
+        }
+
+        /* Decisões */
+        .decisao-card {
+            background: #141414;
+            border-left: 4px solid #d97706;
+            border-radius: 6px;
+            padding: 14px 18px;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .decisao-card .meta {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 6px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #d97706;
+            font-weight: 700;
+        }
+
+        .decisao-card .texto {
+            color: #ccc;
+        }
+
+        /* Produtos grid */
+        .produtos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .card-produto {
+            background: #141414;
+            border: 1px solid #222;
+            border-radius: 8px;
+            padding: 18px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 3px 10px;
+            border-radius: 4px;
+            background: #1f1f1f;
+            border: 1px solid #333;
+            color: #888;
+        }
+
+        .badge.cert { background: #1a3a1a; border-color: #2e5a2e; color: #8fd68f; }
+        .badge.cert.perigosa { background: #3a1a1a; border-color: #5a2e2e; color: #d68f8f; }
+
+        .tag-small {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: #1f1f1f;
+            border: 1px solid #333;
+            color: #aaa;
+            margin-right: 6px;
+            margin-bottom: 4px;
+            display: inline-block;
+        }
+
+        .card-titulo {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .card-desc {
+            font-size: 13px;
+            color: #999;
+            margin-bottom: 8px;
+        }
+
+        .meta-linha {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .meta-linha strong { color: #ccc; }
+
+        .pendente {
+            color: #d97706;
+            font-weight: 700;
+            font-size: 11px;
+        }
+
+        /* Prompt box */
+        .prompt-container {
+            background: #0a0a0a;
+            border: 1px solid #222;
+            border-radius: 6px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .prompt-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: #141414;
+            border-bottom: 1px solid #222;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #666;
+        }
+
+        .prompt-body {
+            padding: 14px 16px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            color: #d1d1d1;
+            white-space: pre-wrap;
+            line-height: 1.5;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .btn-copy {
+            background: #1f1f1f;
+            border: 1px solid #333;
+            color: #ccc;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .btn-copy:hover { background: #2a2a2a; color: #fff; border-color: #444; }
+        .btn-copy.copiado { background: #1a3a1a; border-color: #2e5a2e; color: #8fd68f; }
+
+        .ver-completo {
+            background: transparent;
+            border: none;
+            color: #4a90d9;
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 6px;
+            align-self: flex-start;
+            padding: 0;
+        }
+
+        .ver-completo:hover { color: #6ab0ee; }
+
+        /* Negative prompt */
+        .negativo-box {
+            background: #1a1212;
+            border: 1px solid #332020;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 8px;
+        }
+
+        .negativo-box h4 {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #d68f8f;
+            margin-bottom: 8px;
+        }
+
+        .negativo-box pre {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            color: #d1d1d1;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+
+        /* Checklist */
+        .checklist {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .checklist label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 3px;
+            cursor: pointer;
+        }
+
+        .checklist input { accent-color: #4a90d9; }
+
+        /* Alerta certificação */
+        .alerta-cert {
+            font-size: 12px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-top: 6px;
+        }
+
+        .alerta-cert.ok {
+            background: #1a2a1a;
+            border: 1px solid #2e5a2e;
+            color: #8fd68f;
+        }
+
+        .alerta-cert.warn {
+            background: #2a1a1a;
+            border: 1px solid #5a2e2e;
+            color: #d68f8f;
+        }
+
+        /* Erro */
+        .erro-card {
+            background: #2a1a1a;
+            border: 1px solid #5a2e2e;
+            border-radius: 6px;
+            padding: 14px;
+            color: #d68f8f;
+            font-size: 13px;
+        }
+
+        .erro-card strong { color: #f4a6a6; }
+
+        /* Export */
+        .btn-export {
+            background: #1a3a1a;
+            color: #fff;
+            border: 1px solid #2e5a2e;
+            border-radius: 6px;
+            padding: 12px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-export:hover { background: #1e5e22; }
+
+        /* Toast */
+        #toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f1f1f;
+            color: #fff;
+            border: 1px solid #333;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 13px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        #toast.mostrar { opacity: 1; }
+
+        .rodape {
+            font-size: 11px;
+            color: #666;
+            text-align: center;
+            margin-top: 40px;
+            border-top: 1px solid #222;
+            padding-top: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="top-bar">ZUT MEDIA × REGATTA · AW27 HEROES RGO</div>
+        <h1>Prompt Kits — Safety Footwear</h1>
+        <p>Prompts prontos para os 22 SKUs (12 modelos × 22 cores). Cada hero já tem o prompt de corpo inteiro, crop e negativo. Fotos só de produto, sem modelo.</p>
+        <div class="tags-row">
+            <span class="tag">22 imagens</span>
+            <span class="tag">4 sets</span>
+            <span class="tag accent">3:4 vertical</span>
+            <span class="tag accent">saída 4K</span>
+            <span class="tag accent">sem pose apontando</span>
+            <span class="tag accent">fotos só de produto</span>
+        </div>
+    </header>
+
+    <!-- Nav com âncoras -->
+    <div class="nav-steps">
+        <a href="#decisoes" data-target="decisoes">Decisões do Job</a>
+        <a href="#sets" data-target="sets">1 - Cenários (Sets)</a>
+        <a href="#produtos" data-target="produtos">2 - Produtos (SKUs)</a>
+    </div>
+
+    <!-- Seção 1: Decisões -->
+    <section id="decisoes">
+        <h2>Decisões do Job</h2>
+        <div id="lista-decisoes"></div>
+        <div style="margin-top: 16px;">
+            <label style="font-size:12px;color:#888;">Adicionar decisão:</label><br>
+            <input type="text" id="nova-decisao" placeholder="Ex: Fotos só de produto, sem modelo" style="width: 320px; padding: 8px; border: 1px solid #333; border-radius: 4px; background: #0a0a0a; color: #fff;">
+            <button onclick="adicionarDecisao()" style="padding: 8px 16px; background: #1f1f1f; color: #fff; border: 1px solid #333; border-radius: 4px; cursor: pointer; margin-left: 8px;">Salvar</button>
+        </div>
+    </section>
+
+    <!-- Seção 2: Sets -->
+    <section id="sets">
+        <h2>Cenários (Sets Vazios)</h2>
+        <div class="produtos-grid" id="grid-sets"></div>
+    </section>
+
+    <!-- Seção 3: Produtos -->
+    <section id="produtos">
+        <h2>Produtos — Cards por SKU + Cor</h2>
+        <div class="produtos-grid" id="grid-produtos"></div>
+        <button class="btn-export" onclick="exportarParaPython()">
+            ▶ Gerar estrutura de pastas (export Python)
+        </button>
+        <p style="font-size: 12px; color: #888; margin-top: 8px;">O export lê os dados deste HTML e cria pastas com .txt — não duplique dados em outro lugar.</p>
+    </section>
+
+    <div class="rodape">
+        Regatta Professional · AW27 Safety Footwear · Sistema de Prompts IA · Abre offline · Sem dependências externas
+    </div>
+</div>
+
+<div id="toast">Copiado para a área de transferência!</div>
+
+<script>
+/* ========================
+   DADOS — fáceis de editar
+   ======================== */
+
+const JOB = {
+    cliente: 'Regatta Professional',
+    temporada: 'AW27 Safety Footwear',
+    pastaSaida: 'O:\\04 AI\\_PROMPT KITS FOOTWEAR',
+    decisoes: [
+        { data: '20/10/2026', texto: 'Fotos só de produto, sem modelo' },
+        { data: '20/10/2026', texto: 'Sets fixos primeiro, produtos depois (produtos ainda podem mudar)' },
+        { data: '20/10/2026', texto: 'Regras de certificação S1/SB' }
+    ]
+};
+
+const SETS = [
+    {
+        id: 'set1',
+        nome: 'SET 1 — LOGISTICS CLEAN',
+        tipo: 'Indoor · Limpo · Chão',
+        ambiente: 'clean',
+        tags: ['armazém', 'piso concreto', 'iluminação limpa'],
+        promptVazio: `Single vertical photograph in 3:4 portrait format, one image only: not a collage, no split screen, no text, no logos, no signage.
+Photorealistic empty set for a Regatta Professional AW27 safety footwear campaign: Logistics / Warehouse, indoor and clean. No people, no shoes, no product: the set only, ready for a product to be placed later.
+SCENE: a modern, clean, well-organised logistics warehouse. In the foreground, a smooth, lightly polished grey concrete floor with a faint soft reflection and a thin painted yellow floor-marking line running diagonally. In the background, tall blue and orange pallet racking with neatly stacked cardboard boxes and shrink-wrapped pallets, and a closed metal roller shutter door, all softly out of focus.
+FRAMING: low camera at floor level, as if photographing a shoe. The centre of the floor in the lower half is empty and clear, a sharp, well-lit spot where a single shoe will stand. The floor is in sharp focus there and falls off to a soft blur behind. The upper third is calmer and less busy, with room for a headline.
+MOOD: professional, tidy, light-duty work. Nothing dirty, no mud, no water, no debris, no construction equipment.
+LIGHT: bright, clean overhead warehouse light with a soft key light on the empty spot, a natural soft shadow area on the floor. Neutral white balance, no colour grading, no purple or blue cast, sharp focus, 4K.`,
+        elementos: 'piso de concreto cinza polido, faixa amarela de marcação, estantes de paletes azuis e laranjas, caixas de papelão, paletes encolhidos, porta de enrolar metálica fechada'
+    },
+    {
+        id: 'set1b',
+        nome: 'SET 1b — LOGISTICS WET',
+        tipo: 'Outdoor · Molhado · Poça rasa',
+        ambiente: 'wet',
+        tags: ['pátio externo', 'piso molhado', 'poças de chuva'],
+        promptVazio: `Single vertical photograph in 3:4 portrait format, one image only: not a collage, no split screen, no text, no logos, no signage.
+Photorealistic empty set for a Regatta Professional AW27 safety footwear campaign: Logistics / Warehouse, outdoor and wet. No people, no shoes, no product: the set only, ready for a product to be placed later.
+SCENE: the outdoor yard of a logistics depot just after rain. Wet grey concrete and block paving with shallow rain puddles reflecting the sky, a few wet leaves, a painted yellow line. Background: loading bays with closed roller shutter doors, a parked delivery van and stacked pallets, softly out of focus.
+FRAMING: low camera at floor level, as if photographing a shoe. The centre in the lower half is empty and clear, a sharp, well-lit spot where a single shoe will stand. Wet surfaces in soft focus behind. The upper third is calmer, with room for a headline.
+MOOD: professional, post-rain logistics yard. Shallow puddles allowed, no mud, no construction debris, no heavy equipment.
+LIGHT: soft overcast daylight, natural reflections on wet surfaces, neutral white balance, sharp focus, 4K.`,
+        elementos: 'piso de concreto úmido, bloquetes, poças rasas de chuva, folhas molhadas, faixa amarela, docas de carregamento, portas de enrolar fechadas, van de entrega, paletes'
+    },
+    {
+        id: 'set2',
+        nome: 'SET 2 — MANUFACTURING',
+        tipo: 'Indoor · Industrial · Seco',
+        ambiente: 'dry',
+        tags: ['fábrica', 'piso industrial', 'máquinas ao fundo'],
+        promptVazio: `Single vertical photograph in 3:4 portrait format, one image only: not a collage, no split screen, no text, no logos, no signage.
+Photorealistic empty set for a Regatta Professional AW27 safety footwear campaign: Manufacturing / Factory, indoor and dry. No people, no shoes, no product: the set only, ready for a product to be placed later.
+SCENE: a clean manufacturing floor. Smooth grey concrete in the foreground with faint industrial markings. Background: industrial machinery, metal shelving, safety cones and pallets, softly out of focus. No oil, no grease, no liquids.
+FRAMING: low camera at floor level, as if photographing a shoe. The centre of the floor in the lower half is empty and clear, a sharp, well-lit spot where a single shoe will stand. The upper third is calmer, with room for a headline.
+MOOD: industrial, dry, safety-focused. No mud, no water, no oil stains, no debris.
+LIGHT: bright factory overhead lighting, soft key light on the empty spot, neutral white balance, sharp focus, 4K.`,
+        elementos: 'piso de concreto industrial, marcações de chão, máquinas ao fundo, estantes metálicas, cones de segurança, paletes'
+    },
+    {
+        id: 'set3',
+        nome: 'SET 3 — CONSTRUCTION',
+        tipo: 'Outdoor · Lama · Molhado',
+        ambiente: 'mud',
+        tags: ['obra', 'lama', 'respingos'],
+        promptVazio: `Single vertical photograph in 3:4 portrait format, one image only: not a collage, no split screen, no text, no logos, no signage.
+Photorealistic empty set for a Regatta Professional AW27 safety footwear campaign: Construction / Outdoor, muddy. No people, no shoes, no product: the set only, ready for a product to be placed later.
+SCENE: a muddy construction site. Wet brown earth and muddy ground in the foreground with shallow puddles and mud splatter patterns. Background: construction equipment, scaffolding, building materials, softly out of focus.
+FRAMING: low camera at ground level, as if photographing a shoe. The centre in the lower half is empty and clear, a sharp, well-lit spot where a single shoe will stand. Mud and splatter elements around the edges. The upper third is calmer, with room for a headline.
+MOOD: rugged, outdoor, heavy-duty construction. Mud and splatter allowed, no clean warehouse, no office setting.
+LIGHT: natural daylight, soft shadows, neutral white balance, sharp focus, 4K.`,
+        elementos: 'solo molhado e lamacento, poças de lama, respingos de lama, equipamentos de construção ao fundo, andaimes, materiais de construção'
+    }
+];
+
+const NEG = {
+    set1: 'people, person, legs, feet, shoe on foot, human, model, collage, split screen, text, logo, signage, watermark, dirty, mud, water, puddle, debris, construction equipment, blurry, low resolution, distorted, extra limbs, bad anatomy, watermark, signature, frame, border',
+    set1b: 'people, person, legs, feet, shoe on foot, human, model, collage, split screen, text, logo, signage, watermark, dry, dusty, mud, thick mud, construction debris, heavy machinery, blurry, low resolution, distorted, extra limbs, bad anatomy, watermark, signature, frame, border',
+    set2: 'people, person, legs, feet, shoe on foot, human, model, collage, split screen, text, logo, signage, watermark, mud, water, puddle, oil, grease, liquid, debris, construction site, blurry, low resolution, distorted, extra limbs, bad anatomy, watermark, signature, frame, border',
+    set3: 'people, person, legs, feet, shoe on foot, human, model, collage, split screen, text, logo, signage, watermark, clean, polished, warehouse, office, dry dust, blurry, low resolution, distorted, extra limbs, bad anatomy, watermark, signature, frame, border'
+};
+
+const RULES = {
+    S1: 'Proibido água e lama. Apenas set 1 (clean) e set 2 (manufacturing seco).',
+    SB: 'Proibido água e lama. Apenas set 1 (clean) e set 2 (manufacturing seco).',
+    S3: 'Permitido em todos os sets, incluindo lama (set 3).',
+    S5: 'Permitido em todos os sets, incluindo lama (set 3).',
+    default: 'Verificar restrições no brief do cliente.'
+};
+
+const PRODUCTS = [
+    // SET 1 — LOGISTICS CLEAN
+    { code: 'TRK200', colour: 'Black/Granit', name: 'TRK200', cert: 'S3', set: 'set1', shot: 'grounded', shoe: 'black and grey safety trainer with a composite toe cap and chunky black sole', note: '' },
+    { code: 'TRK200', colour: 'Briar/Lime', name: 'TRK200', cert: 'S3', set: 'set1', shot: 'grounded', shoe: 'brown and lime safety trainer with a composite toe cap and rugged sole', note: '' },
+    { code: 'TRK204', colour: '[COLOUR 1]', name: 'TRK204', cert: 'S1', set: 'set1', shot: 'grounded', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'PENDENTE — conferir cor no brief' },
+    { code: 'TRK232', colour: '[COLOUR 1]', name: 'TRK232', cert: 'SB', set: 'set1', shot: 'grounded', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'PENDENTE — conferir cor no brief' },
+    { code: 'TRK232', colour: '[COLOUR 2]', name: 'TRK232', cert: 'SB', set: 'set1', shot: 'grounded', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'PENDENTE — conferir cor no brief' },
+    { code: 'TRK233', colour: '[COLOUR 1]', name: 'TRK233', cert: 'S1', set: 'set1', shot: 'grounded', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'PENDENTE — conferir cor no brief' },
+    { code: 'TRK233', colour: '[COLOUR 2]', name: 'TRK233', cert: 'S1', set: 'set1', shot: 'grounded', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'PENDENTE — conferir cor no brief' },
+    { code: 'TRK236', colour: '[COLOUR 1]', name: 'TRK236', cert: 'S3', set: 'set1', shot: 'grounded', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'PENDENTE — conferir cor no brief' },
+
+    // SET 1b — LOGISTICS WET
+    { code: 'TRK227', colour: 'Granite/Red', name: 'TRK227', cert: 'S3', set: 'set1b', shot: 'grounded', shoe: 'granite and red waterproof safety shoe with reinforced toe and lug sole', note: 'Única impermeável do grupo logística — permite poça, não permite obra pesada' },
+    { code: 'TRK227', colour: 'Black/Granit', name: 'TRK227', cert: 'S3', set: 'set1b', shot: 'grounded', shoe: 'black and granite waterproof safety shoe with reinforced toe and lug sole', note: 'Única impermeável do grupo logística — permite poça, não permite obra pesada' },
+
+    // SET 2 — MANUFACTURING
+    { code: 'TRK201', colour: '[COLOUR 1]', name: 'TRK201', cert: 'SB', set: 'set2', shot: 'grounded', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'PENDENTE — conferir cor no brief' },
+    { code: 'TRK201', colour: '[COLOUR 2]', name: 'TRK201', cert: 'SB', set: 'set2', shot: 'grounded', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'PENDENTE — conferir cor no brief' },
+    { code: 'TRK205', colour: '[COLOUR 1]', name: 'TRK205', cert: 'S1', set: 'set2', shot: 'grounded', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'PENDENTE — conferir cor no brief' },
+    { code: 'TRK205', colour: '[COLOUR 2]', name: 'TRK205', cert: 'S1', set: 'set2', shot: 'grounded', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'PENDENTE — conferir cor no brief' },
+    { code: 'TRK243', colour: '[COLOUR 1]', name: 'TRK243', cert: 'S3', set: 'set2', shot: 'grounded', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'PENDENTE — conferir cor no brief' },
+    { code: 'TRK243', colour: '[COLOUR 2]', name: 'TRK243', cert: 'S3', set: 'set2', shot: 'grounded', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'PENDENTE — conferir cor no brief' },
+
+    // SET 3 — CONSTRUCTION
+    { code: 'TRK228', colour: '[COLOUR 1]', name: 'TRK228', cert: 'S3', set: 'set3', shot: 'floating', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'PENDENTE — conferir cor no brief' },
+    { code: 'TRK228', colour: '[COLOUR 2]', name: 'TRK228', cert: 'S3', set: 'set3', shot: 'floating', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'PENDENTE — conferir cor no brief' },
+    { code: 'TRK234', colour: '[COLOUR 1]', name: 'TRK234', cert: 'S5', set: 'set3', shot: 'grounded', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'PENDENTE — conferir cor no brief' },
+    { code: 'TRK234', colour: '[COLOUR 2]', name: 'TRK234', cert: 'S5', set: 'set3', shot: 'grounded', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'PENDENTE — conferir cor no brief' },
+    { code: 'TRK235', colour: '[COLOUR 1]', name: 'TRK235', cert: 'S5', set: 'set3', shot: 'floating', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'PENDENTE — conferir cor no brief' },
+    { code: 'TRK235', colour: '[COLOUR 2]', name: 'TRK235', cert: 'S5', set: 'set3', shot: 'floating', shoe: '[DESCRIÇÃO DO CALÇADO]', note: 'PENDENTE — conferir cor no brief' }
+];
+
+/* ========================
+   FUNÇÕES
+   ======================== */
+
+function getSet(id) { return SETS.find(s => s.id === id); }
+function getNeg(setId) { return NEG[setId] || NEG.set1; }
+
+function validarProduto(prod) {
+    const set = getSet(prod.set);
+    const certRule = RULES[prod.cert] || RULES.default;
+    const proibido = [];
+
+    if ((prod.cert === 'S1' || prod.cert === 'SB') && (set.ambiente === 'wet' || set.ambiente === 'mud')) {
+        proibido.push(`Certificação ${prod.cert} não pode aparecer em ${set.ambiente === 'wet' ? 'água/poça' : 'lama'}.`);
+    }
+
+    if (prod.code === 'TRK227' && set.ambiente === 'mud') {
+        proibido.push('TRK227 (impermeável) não pode ir para cenário de obra pesada (lama).');
+    }
+
+    return {
+        valido: proibido.length === 0,
+        proibido: proibido,
+        regraCert: certRule
+    };
+}
+
+function gerarPrompt(prod) {
+    const set = getSet(prod.set);
+    const validacao = validarProduto(prod);
+    if (!validacao.valido) return null;
+
+    const shotTexto = prod.shot === 'grounded'
+        ? 'The shoe stands firmly on the ground surface, flat and stable.'
+        : 'The shoe floats slightly above the ground, isolated, with no contact with the surface.';
+
+    const elementos = set.elementos || '';
+
+    return `${set.promptVazio}
+
+PRODUCT: ${prod.shoe}. Colour: ${prod.colour}. Certification: ${prod.cert}.
+PLACEMENT: ${shotTexto}
+ENVIRONMENT ELEMENTS: ${elementos}.
+COMPOSITION: vertical 3:4, upper third calm for headline, lower third sharp focus on product area, no people, no legs, no feet inside shoe, product only, photorealistic, 4K, commercial advertising style.`;
+}
+
+function gerarNegativo(prod) {
+    const set = getSet(prod.set);
+    let neg = getNeg(set.id);
+    if (prod.shot === 'floating') {
+        neg += ', standing on ground, contact with surface, shadow under shoe touching floor';
+    }
+    return neg;
+}
+
+/* ========================
+   RENDER
+   ======================== */
+
+function renderDecisoes() {
+    const lista = document.getElementById('lista-decisoes');
+    lista.innerHTML = JOB.decisoes.map(d =>
+        `<div class="decisao-card">
+            <div class="meta">${d.data} · FEEDBACK</div>
+            <div class="texto">${d.texto}</div>
+        </div>`
+    ).join('');
+}
+
+function adicionarDecisao() {
+    const input = document.getElementById('nova-decisao');
+    if (!input.value.trim()) return;
+    JOB.decisoes.push({ data: new Date().toLocaleDateString('pt-BR'), texto: input.value.trim() });
+    input.value = '';
+    renderDecisoes();
+}
+
+function renderSets() {
+    const grid = document.getElementById('grid-sets');
+    grid.innerHTML = SETS.map(set => {
+        const skus = PRODUCTS.filter(p => p.set === set.id).map(p => `${p.code} ${p.colour}`).join(', ');
+        return `
+        <div class="card-produto">
+            <div class="card-header">
+                <div>
+                    <div class="card-titulo">${set.nome}</div>
+                    <div class="card-desc">${set.tipo}</div>
+                    ${set.tags.map(t => `<span class="tag-small">${t}</span>`).join('')}
+                </div>
+                <button class="btn-copy" onclick="copiarTexto(this, 'set-${set.id}')">Copiar</button>
+            </div>
+            <div class="prompt-container">
+                <div class="prompt-header">PROMPT DO SET · VAZIO</div>
+                <div class="prompt-body">${set.promptVazio}</div>
+            </div>
+            <div class="meta-linha" style="margin-top:8px;"><strong>SKUs:</strong> ${skus}</div>
+        </div>`;
+    }).join('');
+}
+
+function renderProdutos() {
+    const grid = document.getElementById('grid-produtos');
+    grid.innerHTML = PRODUCTS.map(prod => {
+        const set = getSet(prod.set);
+        const validacao = validarProduto(prod);
+        const prompt = gerarPrompt(prod);
+        const negativo = gerarNegativo(prod);
+        const classeErro = validacao.valido ? '' : 'erro-card';
+        const alertaCert = validacao.valido
+            ? `<div class="alerta-cert ok">✓ ${validacao.regraCert}</div>`
+            : `<div class="alerta-cert warn">⚠ ${validacao.regraCert}</div>`;
+
+        const tagsHtml = [
+            `cert ${prod.cert}`,
+            `set ${set.nome.replace('SET ','').split(' — ')[0]}`,
+            prod.shot,
+            prod.note ? 'pendente' : ''
+        ].filter(Boolean).map(t => `<span class="tag-small">${t}</span>`).join('');
+
+        const conteudoPrompt = validacao.valido
+            ? `
+            <div class="prompt-container">
+                <div class="prompt-header">PROMPT COMPLETO</div>
+                <div class="prompt-body">${prompt}</div>
+            </div>
+            <button class="btn-copy" onclick="copiarPrompt(this, '${prod.code}', '${prod.colour}')">Copiar prompt</button>
+            `
+            : `
+            <div class="${classeErro}">
+                <strong>Combinação proibida:</strong><br>${validacao.proibido.join('<br>')}
+            </div>
+            `;
+
+        return `
+        <div class="card-produto">
+            <div class="card-header">
+                <div>
+                    <div style="display:flex;align-items:baseline;gap:8px;">
+                        <span class="badge cert ${!validacao.valido ? 'perigosa' : ''}">${prod.cert}</span>
+                        <span class="card-titulo">${prod.code}</span>
+                    </div>
+                    <div class="card-desc">${prod.colour} · ${prod.name}</div>
+                    <div style="margin-top:6px;">${tagsHtml}</div>
+                </div>
+                <button class="btn-copy" onclick="copiarPrompt(this, '${prod.code}', '${prod.colour}')">Copiar</button>
+            </div>
+            <div class="meta-linha"><strong>Descrição curta:</strong></div>
+            <textarea style="width:100%;background:#0a0a0a;border:1px solid #222;border-radius:4px;padding:8px;color:#ccc;font-size:12px;font-family:inherit;margin-bottom:8px;" onchange="atualizarShoe('${prod.code}', '${prod.colour}', this.value)">${prod.shoe}</textarea>
+            ${prod.note ? `<div class="meta-linha"><span class="pendente">${prod.note}</span></div>` : ''}
+
+            <div class="meta-linha"><strong>Set:</strong> ${set.nome}</div>
+            <div class="meta-linha"><strong>Tomada:</strong> ${prod.shot}</div>
+
+            ${alertaCert}
+
+            <div class="meta-linha" style="margin-top:8px;"><strong>Anexos:</strong> [Foto do produto] [Foto alternativa]</div>
+
+            ${conteudoPrompt}
+
+            <div class="negativo-box">
+                <h4>NEGATIVE PROMPT</h4>
+                <pre>${negativo}</pre>
+                <button class="btn-copy" style="margin-top:8px;" onclick="copiarNegativo(this, '${prod.code}', '${prod.colour}')">Copiar negative</button>
+            </div>
+
+            <div class="checklist">
+                <label><input type="checkbox"> Sem pessoa</label>
+                <label><input type="checkbox"> Sem pernas</label>
+                <label><input type="checkbox"> Sem pé dentro do calçado</label>
+                <label><input type="checkbox"> Formato 3:4 vertical</label>
+                <label><input type="checkbox"> Terço de cima calmo para título</label>
+                <label><input type="checkbox"> Só produto, sem modelo</label>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function atualizarShoe(code, colour, valor) {
+    const p = PRODUCTS.find(p => p.code === code && p.colour === colour);
+    if (p) p.shoe = valor;
+    renderProdutos();
+}
+
+function copiarTexto(btn, id) {
+    let texto = '';
+    if (id.startsWith('set-')) {
+        const setId = id.replace('set-', '');
+        const set = getSet(setId);
+        texto = set ? set.promptVazio : '';
+    }
+    if (!texto) return;
+    navigator.clipboard.writeText(texto).then(() => {
+        const antigo = btn.innerText;
+        btn.innerText = 'Copiado!';
+        btn.className = 'btn-copy copiado';
+        setTimeout(() => { btn.innerText = antigo; btn.className = 'btn-copy'; }, 1500);
+        mostrarToast();
+    });
+}
+
+function copiarPrompt(btn, code, colour) {
+    const p = PRODUCTS.find(p => p.code === code && p.colour === colour);
+    if (!p) return;
+    const prompt = gerarPrompt(p);
+    if (!prompt) return;
+    navigator.clipboard.writeText(prompt).then(() => {
+        const antigo = btn.innerText;
+        btn.innerText = 'Copiado!';
+        btn.className = 'btn-copy copiado';
+        setTimeout(() => { btn.innerText = antigo; btn.className = 'btn-copy'; }, 1500);
+        mostrarToast();
+    });
+}
+
+function copiarNegativo(btn, code, colour) {
+    const p = PRODUCTS.find(p => p.code === code && p.colour === colour);
+    if (!p) return;
+    const neg = gerarNegativo(p);
+    navigator.clipboard.writeText(neg).then(() => {
+        const antigo = btn.innerText;
+        btn.innerText = 'Copiado!';
+        btn.className = 'btn-copy copiado';
+        setTimeout(() => { btn.innerText = antigo; btn.className = 'btn-copy'; }, 1500);
+        mostrarToast();
+    });
+}
+
+function mostrarToast() {
+    const t = document.getElementById('toast');
+    t.classList.add('mostrar');
+    setTimeout(() => t.classList.remove('mostrar'), 2000);
+}
+
+function exportarParaPython() {
+    alert('O export Python lê este arquivo index.html. Rode o script export_prompt_kits.py no terminal após salvar qualquer alteração aqui.');
+}
+
+/* ========================
+   NAVEGAÇÃO INTERNA (garante funcionamento)
+   ======================== */
+document.querySelectorAll('.nav-steps a').forEach(link => {
+    link.addEventListener('click', function(e) {
+        const target = this.getAttribute('data-target');
+        const el = document.getElementById(target);
+        if (el) {
+            e.preventDefault();
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Atualiza active state visual
+            document.querySelectorAll('.nav-steps a').forEach(a => a.classList.remove('active'));
+            this.classList.add('active');
+        }
+    });
+});
+
+/* ========================
+   INICIALIZA
+   ======================== */
+renderDecisoes();
+renderSets();
+renderProdutos();
+</script>
+
+</body>
+</html>
