@@ -1,7 +1,7 @@
 // Testes do livro contábil. Rodar: npm test
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { checkEntry, monthLabel, monthRange, shiftMonth } from "./journal.ts";
+import { checkEntry, isLocked, monthLabel, monthRange, nextToClose, reopenTarget, shiftMonth } from "./journal.ts";
 
 test("lançamento manual equilibrado passa, com soma em pence", () => {
   const r = checkEntry("Aporte dos sócios", [
@@ -45,4 +45,20 @@ test("períodos por mês", () => {
   assert.equal(shiftMonth("2026-01", -1), "2025-12");
   assert.equal(shiftMonth("2026-12", 1), "2027-01");
   assert.equal(monthLabel("2026-10"), "out/2026");
+});
+
+test("fechamento do mês: o que está travado e o próximo a fechar", () => {
+  assert.equal(isLocked("2026-09-30", "2026-09-30"), true);
+  assert.equal(isLocked("2026-10-01", "2026-09-30"), false);
+  assert.equal(isLocked("2026-01-01", null), false);
+  // nada fechado: sugere o mês passado
+  assert.equal(nextToClose(null, "2026-10-19"), "2026-09");
+  // setembro fechado: outubro ainda não terminou
+  assert.equal(nextToClose("2026-09-30", "2026-10-19"), null);
+  assert.equal(nextToClose("2026-08-31", "2026-10-19"), "2026-09");
+  assert.equal(nextToClose("2025-12-31", "2026-01-02"), null);
+  assert.equal(nextToClose("2025-11-30", "2026-01-02"), "2025-12");
+  // reabrir o último mês: volta para o fim do anterior
+  assert.equal(reopenTarget("2026-09-30"), "2026-08-31");
+  assert.equal(reopenTarget("2026-03-31"), "2026-02-28");
 });

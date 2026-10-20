@@ -3,6 +3,9 @@ import { useEffect, useState } from "react";
 import type { Org } from "@/lib/offline-db";
 import { brDate, errorText, money, openInvoices, type OpenInvoice } from "@/lib/sales";
 import { BUCKET_TEXT, bucket, byCustomer, sumMoney, type CustomerDebt } from "@/lib/receivables";
+import { getCompany } from "@/lib/registry";
+import type { Company } from "@/lib/company";
+import ChaseMessage from "@/components/financas/ChaseMessage";
 
 /** embedded: dentro de Finanças, sem título nem botão de voltar */
 type Props = { org: Org; go: (q: string) => void; embedded?: boolean };
@@ -11,6 +14,13 @@ type Props = { org: Org; go: (q: string) => void; embedded?: boolean };
 export default function Receivables({ org, go, embedded }: Props) {
   const [groups, setGroups] = useState<CustomerDebt<OpenInvoice>[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [company, setCompany] = useState<Company | null>(null);
+
+  useEffect(() => {
+    getCompany(org.id)
+      .then(setCompany)
+      .catch(() => setCompany(null));
+  }, [org.id]);
 
   useEffect(() => {
     openInvoices(org.id)
@@ -23,15 +33,6 @@ export default function Receivables({ org, go, embedded }: Props) {
 
   return (
     <>
-      {!embedded && (
-        <div className="row spread">
-          <h1>A receber</h1>
-          <button className="btn small" onClick={() => go("")}>
-            ← Pedidos
-          </button>
-        </div>
-      )}
-
       {error && <p className="note bad">{error}</p>}
       {!groups && !error && <p className="muted">Carregando…</p>}
 
@@ -89,6 +90,19 @@ export default function Receivables({ org, go, embedded }: Props) {
                 </button>
               ))}
             </div>
+            {g.overdue > 0 && (
+              <ChaseMessage
+                customer={g.customer}
+                invoices={g.invoices.map(i => ({
+                  number: i.number,
+                  due_on: i.due_on,
+                  balance: i.balance,
+                  late: i.late,
+                }))}
+                company={company}
+                orgName={org.name}
+              />
+            )}
           </section>
         );
       })}

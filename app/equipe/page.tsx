@@ -1,6 +1,8 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import Nav from "@/components/Nav";
+import SectionHeader from "@/components/SectionHeader";
+import { CADASTRO_TABS, EMPRESA_TABS, cadastroHref } from "@/components/cadastros/tabs";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { currentOrg } from "@/lib/org";
@@ -101,15 +103,15 @@ export default function EquipePage() {
   return (
     <main>
       <Nav />
-      <div className="row spread">
-        <div>
-          <h1>Equipe</h1>
-          <div className="muted">{org?.name ?? "…"}</div>
-        </div>
-        <button className="btn small" onClick={() => router.push("/empresa")}>
-          ← Empresa
-        </button>
-      </div>
+      <SectionHeader
+        title="Cadastros"
+        tabs={CADASTRO_TABS}
+        current="empresa"
+        onTab={k => router.push(cadastroHref(k))}
+        sub={EMPRESA_TABS}
+        subCurrent="equipe"
+        onSub={k => router.push(cadastroHref(k))}
+      />
 
       {!online && <p className="note warn">Sem internet. A equipe só pode ser vista e alterada com conexão.</p>}
 

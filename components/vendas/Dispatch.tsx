@@ -178,7 +178,7 @@ export default function Dispatch({ orderId, org, go }: Props) {
     <>
       <div className="row spread">
         <div>
-          <h1>Expedição · {order.number}</h1>
+          <h2>Expedição · {order.number}</h2>
           <div className="muted">{order.customer}</div>
         </div>
         <button className="btn small" onClick={() => go("")}>

@@ -75,7 +75,7 @@ export default function ReceiptCost({ receiptId, go }: Props) {
     <>
       <div className="row spread">
         <div>
-          <h1>Custo da entrega</h1>
+          <h2>Custo da entrega</h2>
           {date && <div className="muted">Recebida em {brDate(date)}</div>}
         </div>
         <button className="btn small" onClick={() => go("aba=pagar&ver=entregas")}>

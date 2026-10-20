@@ -11,6 +11,13 @@ import NewOrder from "@/components/vendas/NewOrder";
 import Dispatch from "@/components/vendas/Dispatch";
 import InvoiceView from "@/components/vendas/InvoiceView";
 import Receivables from "@/components/vendas/Receivables";
+import SectionHeader from "@/components/SectionHeader";
+
+const TABS = [
+  { key: "", label: "Pedidos" },
+  { key: "clientes", label: "Clientes" },
+  { key: "receber", label: "A receber" },
+];
 
 /** Vendas numa rota só: ?novo · ?clientes · ?receber · ?pedido=ID (expedição) · ?invoice=ID */
 function Vendas() {
@@ -33,12 +40,22 @@ function Vendas() {
   if (!org) return <p className="muted">Carregando…</p>;
   const pedido = params.get("pedido");
   const invoice = params.get("invoice");
-  if (invoice) return <InvoiceView invoiceId={invoice} org={org} go={go} />;
-  if (pedido) return <Dispatch orderId={pedido} org={org} go={go} />;
-  if (params.has("novo")) return <NewOrder org={org} go={go} />;
-  if (params.has("clientes")) return <Customers org={org} go={go} />;
-  if (params.has("receber")) return <Receivables org={org} go={go} />;
-  return <OrdersList org={org} go={go} />;
+  const current = params.has("clientes") ? "clientes" : params.has("receber") ? "receber" : "";
+
+  let body: React.ReactNode;
+  if (invoice) body = <InvoiceView invoiceId={invoice} org={org} go={go} />;
+  else if (pedido) body = <Dispatch orderId={pedido} org={org} go={go} />;
+  else if (params.has("novo")) body = <NewOrder org={org} go={go} />;
+  else if (current === "clientes") body = <Customers org={org} go={go} />;
+  else if (current === "receber") body = <Receivables org={org} go={go} embedded />;
+  else body = <OrdersList org={org} go={go} />;
+
+  return (
+    <>
+      <SectionHeader title="Vendas" tabs={TABS} current={current} onTab={go} />
+      {body}
+    </>
+  );
 }
 
 export default function VendasPage() {

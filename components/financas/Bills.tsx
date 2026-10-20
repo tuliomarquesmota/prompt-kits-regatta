@@ -33,9 +33,6 @@ export default function Bills({ org, go }: Props) {
       <button className="btn primary" onClick={() => go("aba=pagar&conta=nova")}>
         Lançar conta ou despesa
       </button>
-      <button className="btn" onClick={() => go("aba=pagar&ver=entregas")}>
-        Custo das entregas (margem por caixa)
-      </button>
       {error && <p className="note bad">{error}</p>}
 
       {list && !all && (

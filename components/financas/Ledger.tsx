@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 import type { Org } from "@/lib/offline-db";
-import { listEntries, type JournalEntry } from "@/lib/finance";
+import { getBooksLock, listEntries, type JournalEntry } from "@/lib/finance";
 import { brDate, errorText, money } from "@/lib/sales";
-import { monthLabel, monthRange, shiftMonth } from "@/lib/journal";
+import { isLocked, monthLabel, monthRange, shiftMonth } from "@/lib/journal";
 import { sumMoney } from "@/lib/receivables";
 
 type Props = { org: Org; go: (q: string) => void; month: string };
@@ -20,6 +20,13 @@ const SOURCE: Record<string, string> = {
 export default function Ledger({ org, go, month }: Props) {
   const [list, setList] = useState<JournalEntry[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [lock, setLock] = useState<string | null>(null);
+
+  useEffect(() => {
+    getBooksLock(org.id)
+      .then(setLock)
+      .catch(() => setLock(null));
+  }, [org.id]);
 
   useEffect(() => {
     setList(null);
@@ -37,14 +44,9 @@ export default function Ledger({ org, go, month }: Props) {
 
   return (
     <>
-      <div className="row">
-        <button className="btn primary" style={{ flex: 1 }} onClick={() => go("aba=livro&ver=novo")}>
-          Lançamento manual
-        </button>
-        <button className="btn" style={{ flex: 1 }} onClick={() => go("aba=livro&ver=contas")}>
-          Plano de contas
-        </button>
-      </div>
+      <button className="btn primary" onClick={() => go("aba=livro&ver=novo")}>
+        Lançamento manual
+      </button>
 
       <div className="row spread">
         <button
@@ -54,7 +56,14 @@ export default function Ledger({ org, go, month }: Props) {
         >
           ←
         </button>
-        <strong>{monthLabel(month)}</strong>
+        <span style={{ textAlign: "center" }}>
+          <strong>{monthLabel(month)}</strong>
+          {isLocked(monthRange(month).to, lock) && (
+            <span className="pill ok" style={{ marginLeft: 8 }}>
+              Fechado
+            </span>
+          )}
+        </span>
         <button
           className="btn small"
           onClick={() => go(`aba=livro&mes=${shiftMonth(month, 1)}`)}

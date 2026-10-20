@@ -21,12 +21,6 @@ export default function Receipts({ org, go }: Props) {
 
   return (
     <>
-      <div className="row spread">
-        <h1>Custo das entregas</h1>
-        <button className="btn small" onClick={() => go("aba=pagar")}>
-          ← A pagar
-        </button>
-      </div>
       <p className="note info">
         Para cada entrega, digite o preço por kg de cada produto (da invoice do fornecedor) e os custos extras: frete,
         porto, inspeção. O app calcula o custo de cada caixa e passa a mostrar a margem de cada venda.

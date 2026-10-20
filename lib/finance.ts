@@ -4,6 +4,7 @@ import type { BillRow } from "./payables";
 import type { Payment } from "./sales";
 import type { AccountTotal, VatSums } from "./reports";
 import type { MarginRow } from "./costing";
+import type { AuditRow } from "./audit";
 
 export type AccountType = "asset" | "liability" | "equity" | "income" | "expense";
 export type Account = {
@@ -391,4 +392,33 @@ export async function stockValue(
     boxes_without_cost: Number(data?.boxes_without_cost ?? 0),
     weight_kg: Number(data?.weight_kg ?? 0),
   };
+}
+
+// ---------- Fechamento do mês e histórico ----------
+
+/** Último dia fechado do livro ("AAAA-MM-DD") ou null. */
+export async function getBooksLock(orgId: string): Promise<string | null> {
+  const { data, error } = await supabase().from("organizations").select("books_locked_until").eq("id", orgId).single();
+  if (error) throw error;
+  return (data as { books_locked_until: string | null }).books_locked_until;
+}
+
+export async function closeBooks(orgId: string, until: string): Promise<void> {
+  const { error } = await supabase().rpc("close_books", { target_org: orgId, until });
+  if (error) throw error;
+}
+
+export async function reopenBooks(orgId: string, until: string | null, reason: string): Promise<void> {
+  const { error } = await supabase().rpc("reopen_books", { target_org: orgId, until, reason });
+  if (error) throw error;
+}
+
+export async function listAudit(orgId: string, beforeId: number | null, max = 50): Promise<AuditRow[]> {
+  const { data, error } = await supabase().rpc("list_audit", {
+    target_org: orgId,
+    before_id: beforeId,
+    max_rows: max,
+  });
+  if (error) throw error;
+  return (data ?? []) as AuditRow[];
 }
